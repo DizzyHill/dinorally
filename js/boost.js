@@ -1,0 +1,18 @@
+export default class Boost {
+  constructor(gameWidth, gameHeight, gameSpeed) {
+      this.width = 20;
+      this.height = 20;
+      this.x = gameWidth;
+      this.y = gameHeight / 2 + Math.random() * (gameHeight / 2 - this.height);
+      this.speed = gameSpeed;
+  }
+
+  draw(ctx) {
+      ctx.fillStyle = 'yellow';
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  update() {
+      this.x -= this.speed;
+  }
+}
