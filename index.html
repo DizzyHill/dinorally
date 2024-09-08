@@ -3,50 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Racing Game</title>
-    <style>
-        body {
-            text-align: center;
-        }
-        canvas {
-            background-color: #87CEEB;
-            display: block;
-            margin: 20px auto;
-        }
-        #character-selection, #start_over {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            z-index: 1;
-        }
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-    </style>
+    <title>Dino Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
-    <h1>Dino Racing Game</h1>
-    <div id="game_container">
-        <div id="character-selection">
-            <button class="start-game" data-dinoName="Nitro">Play as Nitro</button>
-            <button class="start-game" data-dinoName="Comet">Play as Comet</button>
-            <button class="start-game" data-dinoName="Fuego">Play as Fuego</button>
-            <button class="start-game" data-dinoName="Bash">Play as Bash</button>
+    <div id="main" class="flex flex-col">
+        <div id="character-selection" class="flex flex-col">
+            <h1>Choose Your Racer</h1>
+            <div class="racers flex flex-row items-center">
+                <div class="start-game" data-dinoName="Nitro">
+                    <img src="./assets/Nitro.png" alt="Nitro Dino" data-dinoName="Nitro" />
+                    Play as Nitro
+                </div>
+                <div class="start-game" data-dinoName="Comet">
+                    <img src="./assets/Comet.png" alt="Comet Dino" data-dinoName="Comet" />
+                    Play as Comet
+                </div>
+                <div class="start-game" data-dinoName="Fuego">
+                    <img src="./assets/Fuego.png" alt="Fuego Dino" data-dinoName="Fuego" />
+                    Play as Fuego
+                </div>
+                <div class="start-game" data-dinoName="Bash">
+                    <img src="./assets/Bash.png" alt="Bash Dino" data-dinoName="Bash" />
+                    Play as Bash
+                </div>
+            </div>
         </div>
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <button id="start_over" onclick="location.reload()">Start Over</button>
-        <script src="game.js"></script>
+
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+        <div id="start_over" class="bg-white text-center p-4 flex flex-col items-center">
+            <h1 class="text-2xl font-bold mb-4">Game Over</h1>
+            <p>You collected <span id="coin-count" class="font-black text-lg text-blue-500"></span> coins</p>
+            <button class="px-4 py-2 bg-blue-500 text-white rounded mt-4" onclick="window.location.reload()">Start Over</button>
+        </div>
     </div>
 </body>
 </html>
