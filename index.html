@@ -3,32 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Game</title>
+    <title>Dino Racing Game</title>
     <style>
-        canvas {
-            border: 2px solid #000;
+        body {
+            text-align: center;
         }
-        #character-selection {
+        canvas {
+            background-color: #87CEEB;
+            display: block;
+            margin: 20px auto;
+        }
+        #character-selection, #start_over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+        }
+        #game-container {
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            margin: 20px;
+            position: relative;
         }
     </style>
 </head>
 <body>
-    <div id="character-selection">
-        <button class="start-game" data-dinoName="Nitro">Play as Nitro</button>
-        <button class="start-game" data-dinoName="Comet">Play as Comet</button>
-        <button class="start-game" data-dinoName="Fuego">Play as Fuego</button>
-        <button class="start-game" data-dinoName="Bash">Play as Bash</button>
+    <h1>Dino Racing Game</h1>
+    <div id="game_container">
+        <div id="character-selection">
+            <button class="start-game" data-dinoName="Nitro">Play as Nitro</button>
+            <button class="start-game" data-dinoName="Comet">Play as Comet</button>
+            <button class="start-game" data-dinoName="Fuego">Play as Fuego</button>
+            <button class="start-game" data-dinoName="Bash">Play as Bash</button>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <button id="start_over" onclick="location.reload()">Start Over</button>
+        <script src="game.js"></script>
     </div>
-
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
-
-    <div id="start_over" style="display:none;">
-        <button onclick="window.location.reload()">Start Over</button>
-    </div>
-
-    <script type="module" src="./main.js"></script>
 </body>
 </html>
