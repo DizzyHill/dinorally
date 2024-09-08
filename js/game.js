@@ -60,7 +60,9 @@ export default class Game {
 
     stopGame() {
         this.isGameRunning = false;
-
+        const playerName = prompt('Game Over! Enter your name for the scoreboard:');
+        this.saveScore(playerName, this.gameSpeed);
+        
         document.getElementById('start_over').style.display = 'flex';
         document.getElementById('coin-count').innerHTML = this.coinCount;
         document.getElementById('difficulty').innerHTML = this.gameSpeed;
@@ -68,6 +70,50 @@ export default class Game {
         this.themeMusic.pause();
         this.themeMusic.currentTime = 0;  // Reset the music to the beginning
         this.gameOverSound.play();
+    }
+
+    saveScore(playerName, difficulty) {
+        // Define the file path (assuming it's in the data folder)
+        const filePath = './data/scoreboard.json';
+    
+        // Fetch the existing scoreboard
+        fetch(filePath)
+            .then(response => response.json())
+            .then(scoreboard => {
+                // Create a new score entry
+                const newScore = { name: playerName, difficulty };
+    
+                // Add the new score and sort by difficulty in descending order
+                scoreboard.push(newScore);
+                scoreboard.sort((a, b) => b.difficulty - a.difficulty);
+    
+                // Keep only the top 5 scores
+                const top5Scores = scoreboard.slice(0, 5);
+    
+                // Write the updated scoreboard back to the file
+                this.updateScoreboardFile(filePath, top5Scores);
+            })
+            .catch(error => {
+                console.error('Error fetching scoreboard:', error);
+            });
+    }
+    
+    // Function to write to the scoreboard.json file
+    updateScoreboardFile(filePath, top5Scores) {
+        fetch(filePath, {
+            method: 'POST',  // or 'PUT' depending on your server
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(top5Scores),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Scoreboard updated:', data);
+        })
+        .catch((error) => {
+            console.error('Error updating scoreboard:', error);
+        });
     }
 
     createBots(chosenDino) {
