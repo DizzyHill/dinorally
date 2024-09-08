@@ -12,23 +12,31 @@
 <body>
     <div id="main" class="flex flex-col">
         <div id="character-selection" class="flex flex-col">
-            <h1>Choose Your Racer</h1>
-            <div class="racers flex flex-row items-center">
-                <div class="start-game" data-dinoName="Nitro">
-                    <img src="./assets/Nitro.png" alt="Nitro Dino" data-dinoName="Nitro" />
-                    Play as Nitro
+            <h1 class="text-2xl font-bold mb-4">Choose Your Racer</h1>
+            <div class="racers grid grid-cols-4 gap-2">
+                <div class="start-game flex flex-col items-center justify-between" data-dinoName="Nitro">
+                    <div class="mt-auto mb-2">
+                        <img class="w-full" src="./assets/Nitro.png" alt="Nitro Dino" data-dinoName="Nitro" />
+                    </div>
+                    Nitro
                 </div>
-                <div class="start-game" data-dinoName="Comet">
-                    <img src="./assets/Comet.png" alt="Comet Dino" data-dinoName="Comet" />
-                    Play as Comet
+                <div class="start-game flex flex-col items-center justify-end" data-dinoName="Comet">
+                    <div class="mt-auto mb-2">
+                        <img class="w-full" src="./assets/Comet.png" alt="Comet Dino" data-dinoName="Comet" />
+                    </div>
+                    Comet
                 </div>
-                <div class="start-game" data-dinoName="Fuego">
-                    <img src="./assets/Fuego.png" alt="Fuego Dino" data-dinoName="Fuego" />
-                    Play as Fuego
+                <div class="start-game flex flex-col items-center justify-between" data-dinoName="Fuego">
+                    <div class="mt-auto mb-2">
+                        <img class="w-full" src="./assets/Fuego.png" alt="Fuego Dino" data-dinoName="Fuego" />
+                    </div>
+                    Fuego
                 </div>
-                <div class="start-game" data-dinoName="Bash">
-                    <img src="./assets/Bash.png" alt="Bash Dino" data-dinoName="Bash" />
-                    Play as Bash
+                <div class="start-game flex flex-col items-center justify-between" data-dinoName="Bash">
+                    <div class="mt-auto mb-2">
+                        <img class="w-full" src="./assets/Bash.png" alt="Bash Dino" data-dinoName="Bash" />
+                    </div>
+                    Bash
                 </div>
             </div>
         </div>
@@ -37,7 +45,7 @@
 
         <div id="start_over" class="bg-white text-center p-4 flex flex-col items-center">
             <h1 class="text-2xl font-bold mb-4">Game Over</h1>
-            <p>You collected <span id="coin-count" class="font-black text-lg text-blue-500"></span> coins</p>
+            <p>You collected <span id="coin-count" class="font-black text-lg text-blue-500"></span> coins and got to difficulty level <span id="difficulty" class="font-black text-lg text-green-500"></span></p>
             <button class="px-4 py-2 bg-blue-500 text-white rounded mt-4" onclick="window.location.reload()">Start Over</button>
         </div>
     </div>

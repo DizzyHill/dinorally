@@ -3,6 +3,8 @@ import Obstacle from './obstacle.js';
 import Jump from './jump.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
+import Bot from './bot.js';
+
 
 export default class Game {
     constructor(canvasId) {
@@ -11,6 +13,7 @@ export default class Game {
         this.gameWidth = this.canvas.width;
         this.gameHeight = this.canvas.height;
         this.player = null;
+        this.bots = [];
         this.gameSpeed = 2;
         this.obstacles = [];
         this.boosts = [];
@@ -47,6 +50,7 @@ export default class Game {
         this.coins = [];
         this.isGameRunning = true;
         this.coinCount = 0;
+        this.bots = this.createBots(dinoName);
         this.spawnObjects();
         this.increaseDifficulty();  // Start increasing game speed
         this.gameLoop();
@@ -59,10 +63,32 @@ export default class Game {
 
         document.getElementById('start_over').style.display = 'flex';
         document.getElementById('coin-count').innerHTML = this.coinCount;
+        document.getElementById('difficulty').innerHTML = this.gameSpeed;
         // Stop the theme music when the game is over
         this.themeMusic.pause();
         this.themeMusic.currentTime = 0;  // Reset the music to the beginning
         this.gameOverSound.play();
+    }
+
+    createBots(chosenDino) {
+        const numBots = 1; // Number of bots
+        const dinoNames = ['Nitro', 'Comet', 'Fuego', 'Bash']; // Array of dino names
+        const index = dinoNames.indexOf(chosenDino);
+        dinoNames.splice(index, 1);
+    
+        return Array.from({ length: numBots }, () => {
+            const randomDinoName = dinoNames[Math.floor(Math.random() * dinoNames.length)]; // Pick a random dino name
+            return new Bot(randomDinoName, this.gameWidth, this.gameHeight, this.gameSpeed); // Pass random dino name to BotRacer
+        });
+    }
+    
+    spawnObjects() {
+        if (Math.random() < 0.2) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
+        if (Math.random() < 0.06) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
+        if (Math.random() < 0.05) this.boosts.push(new Boost(this.gameWidth, this.gameHeight, this.gameSpeed));
+        if (Math.random() < 0.15) this.coins.push(new Coin(this.gameWidth, this.gameHeight, this.gameSpeed));
+
+        if (this.isGameRunning) setTimeout(() => this.spawnObjects(), 1000);
     }
 
     // Increase difficulty over time
@@ -91,15 +117,7 @@ export default class Game {
         this.boosts.forEach(boost => boost.speed = this.gameSpeed);
         this.jumps.forEach(jump => jump.speed = this.gameSpeed);
         this.coins.forEach(coin => coin.speed = this.gameSpeed);
-    }
-
-    spawnObjects() {
-        if (Math.random() < 0.3) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
-        if (Math.random() < 0.06) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
-        if (Math.random() < 0.05) this.boosts.push(new Boost(this.gameWidth, this.gameHeight, this.gameSpeed));
-        if (Math.random() < 0.15) this.coins.push(new Coin(this.gameWidth, this.gameHeight, this.gameSpeed));
-
-        if (this.isGameRunning) setTimeout(() => this.spawnObjects(), 1000);
+        this.bots.forEach(bot => bot.speed = this.gameSpeed);
     }
 
     detectCollision(player, item) {
@@ -163,11 +181,31 @@ export default class Game {
             // Obstacle
             if (obj instanceof Obstacle && this.detectCollision(this.player, obj)) {
                 this.isGameRunning = false;
-                // alert('Game Over! You hit an obstacle.');
+            }
+
+            // Bot
+            if (obj instanceof Bot) {
+                if (this.detectCollision(this.player, obj)) {
+                    console.log("You hit a bot.");
                 }
 
+                this.coins.forEach((coin, coinIndex) => {
+                    if (this.detectCollision(obj, coin)) {
+                        this.coins.splice(coinIndex, 1);  // Remove the coin from the game
+                    }
+                });
+
+                this.obstacles.forEach(obstacle => {
+                    if (this.detectCollision(obj, obstacle)) {
+                        obj.stalled = true;  // Stall the bot when it hits an obstacle
+                    }
+                });
+            }
+
             if (obj.x + obj.width < 0) {
-                objects.splice(index, 1);
+                if (!(obj instanceof Bot)) {
+                    objects.splice(index, 1);
+                }   
             }
         });
     }
@@ -181,6 +219,7 @@ export default class Game {
         this.ctx.clearRect(0, 0, this.gameWidth, this.gameHeight);
 
         this.drawBackground();
+        this.updateObjects(this.bots);
         this.player.update();
         this.player.draw(this.ctx);
         this.drawCoinTally();

@@ -23,16 +23,12 @@ canvas {
 }
 
 .start-game {
-  margin-right: .5rem;
-  margin-left: .5rem;
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  width: 200px;
-  flex: 1 1 auto;
 }
 
 .start-game:hover {

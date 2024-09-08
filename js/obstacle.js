@@ -1,8 +1,8 @@
 // obstacle.js
 export default class Obstacle {
   constructor(gameWidth, gameHeight, gameSpeed) {
-      this.width = 40;
-      this.height = 60;
+      this.width = 50;
+      this.height = 50;
       this.x = gameWidth;
       this.y = gameHeight / 2 + Math.random() * (gameHeight / 2 - this.height);
       this.speed = gameSpeed;
