@@ -10,6 +10,8 @@ export default class Game {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
         this.gameWidth = this.canvas.width;
         this.gameHeight = this.canvas.height;
         this.player = null;
@@ -84,7 +86,7 @@ export default class Game {
     }
     
     spawnObjects() {
-        if (Math.random() < 0.3) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
+        if (Math.random() < 0.5) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.06) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.05) this.boosts.push(new Boost(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.15) this.coins.push(new Coin(this.gameWidth, this.gameHeight, this.gameSpeed));
