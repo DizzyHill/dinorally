@@ -21,7 +21,7 @@ export default class Game {
         this.difficulty_level = 2;
         this.obstacles = [];
         this.boosts = [];
-        this.jumps = [];
+        // this.jumps = [];
         this.coins = [];
         this.isGameRunning = false;
         this.coinCount = 0;
@@ -50,7 +50,7 @@ export default class Game {
         this.gameSpeed = 0;
         this.obstacles = [];
         this.boosts = [];
-        this.jumps = [];
+        // this.jumps = [];
         this.coins = [];
         this.isGameRunning = true;
         this.coinCount = 0;
@@ -103,7 +103,7 @@ export default class Game {
     
     spawnObjects() {
         if (Math.random() < 0.5) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
-        if (Math.random() < 0.1) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
+        // if (Math.random() < 0.1) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.05) this.boosts.push(new Boost(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.15) this.coins.push(new Coin(this.gameWidth, this.gameHeight, this.gameSpeed));
 
