@@ -3,12 +3,12 @@ export default class Bot {
     this.width = 100;
     this.height = 75;
     if (dinoName === 'Bash') {
-      this.height = 100;
-      this.width = 80.5;
+      this.height = 120;
+      this.width = 100;
     }
     if (dinoName === 'Comet') {
-        this.height = 100;
-        this.width = 113.1;
+        this.height = 110;
+        this.width = 124.4;
     }
     if (dinoName === 'Fuego') {
         this.height = 100;

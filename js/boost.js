@@ -1,7 +1,7 @@
 export default class Boost {
   constructor(gameWidth, gameHeight, gameSpeed) {
-      this.width = 30;
-      this.height = 20;
+      this.width = 60;
+      this.height = 40;
       this.x = gameWidth;
       this.y = gameHeight / 2 + Math.random() * (gameHeight / 2 - this.height);
       this.speed = gameSpeed;
