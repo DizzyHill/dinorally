@@ -128,7 +128,7 @@ export default class Player {
         this.isJumping = true;  // Set jumping flag
         let originalY = this.y;
         let jumpHeight = 120;  // Adjust based on desired jump height
-        let jumpDuration = 700;  // Time to complete the jump animation
+        let jumpDuration = 800;  // Time to complete the jump animation
 
         // Animate the jump up
         const upTween = new Tween(this)
