@@ -17,6 +17,7 @@ export default class Game {
         this.player = null;
         this.bots = [];
         this.gameSpeed = 2;
+        this.difficulty_level = 2;
         this.obstacles = [];
         this.boosts = [];
         this.jumps = [];
@@ -45,7 +46,7 @@ export default class Game {
     startGame(dinoName) {
         document.getElementById('character-selection').style.display = 'none';
         this.player = new Player(dinoName, this.dinos[dinoName].color, this.gameHeight, this.gameSpeed, this.gameWidth); //Build the player object
-        this.gameSpeed = 2;
+        this.gameSpeed = 0;
         this.obstacles = [];
         this.boosts = [];
         this.jumps = [];
@@ -53,11 +54,25 @@ export default class Game {
         this.isGameRunning = true;
         this.coinCount = 0;
         this.bots = this.createBots(dinoName);
-        this.spawnObjects();
-        this.increaseDifficulty();  // Start increasing game speed
         this.gameLoop();
-        // Start playing the theme music when the game starts
-        this.themeMusic.play();
+        // Play the "321go.mp3" file for 6 seconds
+        const countdownAudio = new Audio('./assets/sounds/321go.mp3');
+        countdownAudio.volume = 0.3;
+
+        countdownAudio.play();
+        
+        // Wait for 6 seconds before starting the game
+        setTimeout(() => {
+            // Start the game after 6 seconds
+            this.gameSpeed = 2;
+            this.bots.stalled = false;
+            this.spawnObjects();
+            this.increaseDifficulty();  // Start increasing game speed
+            
+
+            // Start playing the theme music when the game starts
+            this.themeMusic.play();
+        }, 3000);
     }
 
     stopGame() {
@@ -65,7 +80,7 @@ export default class Game {
 
         document.getElementById('start_over').style.display = 'flex';
         document.getElementById('coin-count').innerHTML = this.coinCount;
-        document.getElementById('difficulty').innerHTML = this.gameSpeed;
+        document.getElementById('difficulty').innerHTML = this.difficulty_level;
         // Stop the theme music when the game is over
         this.themeMusic.pause();
         this.themeMusic.currentTime = 0;  // Reset the music to the beginning
@@ -98,6 +113,7 @@ export default class Game {
     increaseDifficulty() {
         setInterval(() => {
             if (this.isGameRunning) {
+                this.difficulty_level += 0.5;
                 this.gameSpeed += 0.5;  // Increment game speed every few seconds
                 this.updateSpeeds();  // Update background and object speeds
             }
@@ -110,10 +126,39 @@ export default class Game {
     }
 
     drawDifficulty() {
+        const text = `Difficulty: ${this.difficulty_level}`;
+        const fontSize = 20;
+        const padding = 10;
+        const boxWidth = 180;
+        const boxHeight = 40;
+        const x = 20;  // Position near the left edge
+        const y = 10;  // Position near the top edge
+    
+        // Set up text style
+        this.ctx.font = `${fontSize}px Arial`;
         this.ctx.fillStyle = 'black';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(`Difficulty: ${this.gameSpeed.toFixed(1)}`, 20, 30); // Display game speed
+    
+        // Draw rounded white box
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + 10, y); // Start at top-left corner with rounding
+        this.ctx.lineTo(x + boxWidth - 10, y); // Top line
+        this.ctx.quadraticCurveTo(x + boxWidth, y, x + boxWidth, y + 10); // Top-right corner
+        this.ctx.lineTo(x + boxWidth, y + boxHeight - 10); // Right side
+        this.ctx.quadraticCurveTo(x + boxWidth, y + boxHeight, x + boxWidth - 10, y + boxHeight); // Bottom-right corner
+        this.ctx.lineTo(x + 10, y + boxHeight); // Bottom line
+        this.ctx.quadraticCurveTo(x, y + boxHeight, x, y + boxHeight - 10); // Bottom-left corner
+        this.ctx.lineTo(x, y + 10); // Left side
+        this.ctx.quadraticCurveTo(x, y, x + 10, y); // Top-left corner
+        this.ctx.closePath();
+    
+        this.ctx.fillStyle = 'white'; // White background for the box
+        this.ctx.fill();
+    
+        // Draw difficulty level text inside the box
+        this.ctx.fillStyle = 'black'; // Set text color to black
+        this.ctx.fillText(text, x + padding, y + 27); // Position text inside the box
     }
+    
 
     updateObjectSpeeds() {
         this.obstacles.forEach(obstacle => obstacle.speed = this.gameSpeed);
@@ -123,39 +168,81 @@ export default class Game {
         this.bots.forEach(bot => bot.speed = this.gameSpeed);
     }
 
+    // Helper function for rectangular collision
+    detectRectangularCollision(obj1, obj2, paddingX = 0, paddingY = 0) {
+        return (
+            obj1.x < obj2.x + obj2.width - paddingX &&
+            obj1.x + obj1.width - paddingX > obj2.x &&
+            obj1.y < obj2.y + obj2.height - paddingY &&
+            obj1.y + obj1.height - paddingY > obj2.y
+        );
+    }
+
+    // Main collision detection function
     detectCollision(player, item) {
         if (item instanceof Obstacle) {
-            return (
-                player.x < item.x + item.width &&
-                player.x + player.width * 0.5 > item.x &&
-                player.y < item.y + item.height &&
-                player.y + player.height * 0.5 > item.y
-            );
+            // Smaller hitbox for obstacles (with optional padding)
+            const paddingX = player.width * 0.25;  // Reduce hitbox size by 25% horizontally
+            const paddingY = player.height * 0.25; // Reduce hitbox size by 25% vertically
+            return this.detectRectangularCollision(player, item, paddingX, paddingY);
         } else {
-            return (
-                player.x < item.x + item.width &&
-                player.x + player.width > item.x &&
-                player.y < item.y + item.height &&
-                player.y + player.height > item.y
-            );
+            // Standard hitbox for other items (no padding)
+            return this.detectRectangularCollision(player, item);
         }
     }
 
     drawBackground() {
-        this.bgX -= this.backgroundSpeed;
-        if (this.bgX <= -this.gameWidth * 4) this.bgX = 0;
-
+        // Only move the background if the gameSpeed is greater than 0
+        if (this.gameSpeed > 0) {
+            this.bgX -= this.backgroundSpeed;
+        }
+    
+        // Reset the background position when it moves off-screen
+        if (this.bgX <= -this.gameWidth * 4) {
+            this.bgX = 0;
+        }
+    
+        // Calculate the number of tiles needed to cover the screen
         const numTiles = Math.ceil(this.gameWidth / this.backgroundImage.width) + 4;
-
+    
+        // Draw the background tiles
         for (let i = 0; i < numTiles; i++) {
             this.ctx.drawImage(this.backgroundImage, this.bgX + i * this.backgroundImage.width, 0, this.backgroundImage.width, this.gameHeight);
         }
     }
 
     drawCoinTally() {
+        const text = `Pickles: ${this.coinCount}`;
+        const fontSize = 20;
+        const padding = 10;
+        const boxWidth = 150;
+        const boxHeight = 40;
+        const x = this.gameWidth - boxWidth - 20;
+        const y = 10;
+    
+        // Set up text style
+        this.ctx.font = `${fontSize}px Arial`;
         this.ctx.fillStyle = 'black';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(`Coins: ${this.coinCount}`, this.gameWidth - 120, 30);
+    
+        // Draw rounded white box
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + 10, y); // Start at top-left corner with rounding
+        this.ctx.lineTo(x + boxWidth - 10, y); // Top line
+        this.ctx.quadraticCurveTo(x + boxWidth, y, x + boxWidth, y + 10); // Top-right corner
+        this.ctx.lineTo(x + boxWidth, y + boxHeight - 10); // Right side
+        this.ctx.quadraticCurveTo(x + boxWidth, y + boxHeight, x + boxWidth - 10, y + boxHeight); // Bottom-right corner
+        this.ctx.lineTo(x + 10, y + boxHeight); // Bottom line
+        this.ctx.quadraticCurveTo(x, y + boxHeight, x, y + boxHeight - 10); // Bottom-left corner
+        this.ctx.lineTo(x, y + 10); // Left side
+        this.ctx.quadraticCurveTo(x, y, x + 10, y); // Top-left corner
+        this.ctx.closePath();
+    
+        this.ctx.fillStyle = 'white'; // White background for the box
+        this.ctx.fill();
+    
+        // Draw coin count text inside the box
+        this.ctx.fillStyle = 'black'; // Set text color to black
+        this.ctx.fillText(text, x + padding, y + 27); // Position text inside the box
     }
 
     updateObjects(objects) {
@@ -207,9 +294,10 @@ export default class Game {
                     }
                 });
 
-                this.obstacles.forEach(obstacle => {
+                this.obstacles.forEach((obstacle, obstacleIndex) => {
                     if (this.detectCollision(obj, obstacle)) {
-                        obj.stalled = true;  // Stall the bot when it hits an obstacle
+                        obj.stall(); // Stall the bot when it hits an obstacle
+                        this.obstacles.splice(obstacleIndex, 1);
                     }
                 });
             }

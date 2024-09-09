@@ -28,7 +28,8 @@ export default class Bot {
     this.color = 'gray'; // or any color you prefer
     this.baseSpeed = gameSpeed;
     this.isJumping = false;
-    this.boosted = Math.random() > 0.5; // Randomly boost speed
+    this.boosted = false;
+    this.boostSpeed = Math.random() > 0.5; // Randomly boost speed
     this.boundaryRight = this.gameWidth - this.width;
     this.boundaryLeft = 0;
     this.boundaryTop = this.gameHeight * 0.55 - this.height;
@@ -49,31 +50,27 @@ export default class Bot {
   }
 
   update() {
-    // Adjust speed based on boost
-    this.x -= this.boosted ? this.speed * 1.5 : this.speed;
+
+    console.log("Bot Speed:" + this.speed + "Bot pos: " + this.x);
+
+    if (this.stalled) {
+      // If the bot is stalled, it remains at its position temporarily
+      // this.dx = gameSpeed;
+      this.x -= this.speed;
+    } else {
+      if (Math.random() < 0.01) {
+        this.speed += Math.random() * 2 - 1; // Adjust speed randomly (pass or fall behind)
+        this.dx = this.speed;
+      }
+      this.dx = this.speed;
+      this.x += this.dx;
+    }
     
     // Add random vertical movement for more variety
     if (Math.random() < 0.01) {
       this.y += Math.random() * 10 - 5;
     }
-    if (Math.random() < 0.01) {
-      this.speed += Math.random() * 2 - 1; // Adjust speed randomly (pass or fall behind)
-      this.dx = this.speed;
-      console.log("Bot Speed: ", this.speed);
-      console.log("Bot pos: ", this.x);
-
-    }
     
-    if (!this.stalled) {
-      this.x += this.dx;
-    } else {
-        // If the bot is stalled, it remains at its position temporarily
-        this.dx = 0;
-        setTimeout(() => {
-            this.stalled = false;  // Recover after being stalled
-            this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
-        }, 1000); // Stall for 1 second
-    }
     
     // Reset the bot's position if it goes off screen
     if (this.x > this.gameWidth) {
@@ -89,21 +86,43 @@ export default class Bot {
     // Block Bot from going too far past the left part of the screen
     if (this.x < this.boundaryLeft - this.width * 2) {
         this.x = this.boundaryLeft - this.width * 2;
+        this.boost();
     }
     
     // Speed Bot up if they past the left part of the screen
-    if (this.x < this.boundaryLeft - this.width) {
-      this.dx = this.baseSpeed * 4;
-    }
+    // if (this.x < this.boundaryLeft - this.width) {
+    //   // this.dx = this.baseSpeed * 4;
+    //   this.boost();
+    // }
 
     // Block Bot from going past the right part of the screen
-    if (this.x > this.boundaryRight) {
-        this.x = this.boundaryRight;
-    }
+    // if (this.x > this.boundaryRight) {
+    //     this.x = this.boundaryRight - this.width;
+    //     this
+    // }
 
     // If the bot is back on screen, reset the speed
-    if (this.x > this.boundaryRight - this.width * 2) {
-      this.speed = this.baseSpeed; // Reset the speed back to the original
+    if (this.x > this.boundaryRight - this.width * 3) {
+      // this.speed = this.baseSpeed; // Reset the speed back to the original
+      this.stall(2000);
     }
+  }
+
+  boost() {
+    this.boosted = true;
+    setTimeout(() => {
+      this.boosted = false;
+    }, 1000);
+  }
+
+  stall(delay = 1000) {
+    console.log("Bot Stalled");
+    this.stalled = true;
+    this.dx = 0;
+    setTimeout(() => {
+        console.log("Bot Unstalled");
+        this.stalled = false;  // Recover after being stalled
+        this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
+    }, delay); // Stall for 1 second by default
   }
 }

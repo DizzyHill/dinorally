@@ -33,15 +33,11 @@ export default class Obstacle {
   update() {
       this.x -= this.speed;
 
-      // Block Player from going to the top part of the screen 
+      // Block Obstacle from going to the top part of the screen 
       if (!this.isJumping && this.y < this.boundaryTop) this.y = this.boundaryTop;
-      // Block Player from going past the bottom part of the screen
+      // Block Obstacle from going past the bottom part of the screen
       if (this.y > this.boundaryBottom - this.height * 2) this.y = this.boundaryBottom - this.height * 2;
-      // Block Player from going past the left part of the screen
-    //   if (this.x < this.boundaryLeft) {
-    //       this.x = this.boundaryLeft;
-    //   }
-      // Block Player from going past the right part of the screen
+      // Block Obstacle from going past the right part of the screen
       if (this.x > this.boundaryRight) {
           this.x = this.boundaryRight;
       }
