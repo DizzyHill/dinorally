@@ -1,5 +1,5 @@
 // player.js
-import {Tween, Easing} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
+import { Tween, Easing } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 
 export default class Player {
   constructor(dinoName, color, gameHeight, gameSpeed, gameWidth) {
@@ -81,8 +81,8 @@ export default class Player {
   }
 
   update() {
-    console.log("gmae Speed: " + this.speed);
-    console.log("Player moving", this.isMoving);
+    // console.log("gmae Speed: " + this.speed);
+    // console.log("Player moving", this.isMoving);
     // Apply vertical oscillation to simulate running effect
     this.oscillationPhase += this.oscillationFrequency;
     this.y += Math.sin(this.oscillationPhase) * this.oscillationAmplitude;
@@ -123,18 +123,29 @@ export default class Player {
   }
 
   jump() {
-    if ((!this.isJumping) && this.speed > 0) {
-        console.log("Jumping", (this.speed * 1000) / 5);
-        let originalPosition = this.y;
-        let hangTime = (this.speed * 1000) / 5;
-        this.dx += hangTime / 20;
-        this.dy -= 15;
-        console.log(this.y);
-        this.isJumping = true;
-        setTimeout(() => {
-            this.isJumping = false;
-            this.y = originalPosition;
-        }, hangTime);
+    if (!this.isJumping) {  // Ensure jump happens only once per press
+        console.log("Jumping");
+        this.isJumping = true;  // Set jumping flag
+        let originalY = this.y;
+        let jumpHeight = 120;  // Adjust based on desired jump height
+        let jumpDuration = 700;  // Time to complete the jump animation
+
+        // Animate the jump up
+        const upTween = new Tween(this)
+            .to({ y: originalY - jumpHeight }, jumpDuration / 2)
+            .easing(Easing.Quadratic.Out);
+        
+        // Animate the fall down
+        const downTween = new Tween(this)
+            .to({ y: originalY }, jumpDuration / 2)
+            .easing(Easing.Quadratic.In)
+            .onComplete(() => {
+                this.isJumping = false;  // Reset jumping flag after landing
+            });
+
+        // Chain the tweens: jump up, then fall down
+        upTween.chain(downTween);
+        upTween.start();
     }
   }
     // jump() {
