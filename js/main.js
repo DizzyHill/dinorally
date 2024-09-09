@@ -23,26 +23,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (e.key) {
             case 'ArrowUp':
+            case 'w':
                 game.player.dy = -4;
                 break;
             case 'ArrowDown':
+            case 's':
                 game.player.dy = 4;
                 break;
             case 'ArrowLeft':
+            case 'a':
                 game.player.dx = -3;
                 break;
             case 'ArrowRight':
+            case 'd':
                 game.player.dx = 2;
+                break;
+            case ' ':
+                // game.player.isJumping = true;
+                game.player.jump();
                 break;
         }
     });
 
     // Reset player's velocity when the keys are released
-    window.addEventListener('keyup', () => {
+    window.addEventListener('keyup', (e) => {
         if (game.player) {
-            game.player.isMoving = false;
-            game.player.dy = 0;
-            game.player.dx = 0;
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'w':
+                    game.player.dy = 0;
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    game.player.dy = 0;
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                    game.player.dx = 0;
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    game.player.dx = 0;
+                    break;
+            }
+            game.player.isMoving = game.player.dy !== 0 || game.player.dx !== 0;
         }
     });
 });

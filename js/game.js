@@ -1,3 +1,4 @@
+import { Tween, Easing, update as TWEENUpdate } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 import Player from './player.js';
 import Obstacle from './obstacle.js';
 import Jump from './jump.js';
@@ -153,11 +154,11 @@ export default class Game {
                 objects.splice(index, 1);
             }
 
-            // Jump
-            if (obj instanceof Jump && this.detectCollision(this.player, obj)) {
-                this.player.jump();
-                objects.splice(index, 1);
-            }
+            // // Jump
+            // if (obj instanceof Jump && this.detectCollision(this.player, obj)) {
+            //     this.player.jump();
+            //     objects.splice(index, 1);
+            // }
 
             // Obstacle
             if (obj instanceof Obstacle && this.detectCollision(this.player, obj)) {
@@ -186,12 +187,12 @@ export default class Game {
                     }
                 });
 
-                this.jumps.forEach((jump, jumpIndex) => {
-                    if (this.detectCollision(obj, jump)) {
-                        obj.jump();
-                        this.jumps.splice(jumpIndex, 1);
-                    }
-                });
+                // this.jumps.forEach((jump, jumpIndex) => {
+                //     if (this.detectCollision(obj, jump)) {
+                //         obj.jump();
+                //         this.jumps.splice(jumpIndex, 1);
+                //     }
+                // });
 
                 this.coins.forEach((coin, coinIndex) => {
                     if (this.detectCollision(obj, coin)) {
@@ -218,7 +219,7 @@ export default class Game {
     updateObjectSpeeds() {
         this.obstacles.forEach(obstacle => obstacle.speed = this.gameSpeed);
         this.boosts.forEach(boost => boost.speed = this.gameSpeed);
-        this.jumps.forEach(jump => jump.speed = this.gameSpeed);
+        // this.jumps.forEach(jump => jump.speed = this.gameSpeed);
         this.coins.forEach(coin => coin.speed = this.gameSpeed);
         this.bots.forEach(bot => bot.speed = this.gameSpeed);
     }
@@ -352,7 +353,7 @@ export default class Game {
         this.updateObjects(this.boosts);
         this.updateObjects(this.jumps);
         this.updateObjects(this.coins);
-
         requestAnimationFrame(this.gameLoop.bind(this));
+        TWEENUpdate();
     }
 }
