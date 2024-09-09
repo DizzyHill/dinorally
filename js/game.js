@@ -1,7 +1,7 @@
 import { Tween, Easing, update as TWEENUpdate } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 import Player from './player.js';
 import Obstacle from './obstacle.js';
-import Jump from './jump.js';
+// import Jump from './jump.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
 import Bot from './bot.js';
