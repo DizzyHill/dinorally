@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('keydown', (e) => {
         if (!game.player) return;
 
+        game.player.isMoving = true;
+
         switch (e.key) {
             case 'ArrowUp':
                 game.player.dy = -4;
@@ -27,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 game.player.dy = 4;
                 break;
             case 'ArrowLeft':
-                game.player.dx = -2;
+                game.player.dx = -3;
                 break;
             case 'ArrowRight':
                 game.player.dx = 2;
@@ -38,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Reset player's velocity when the keys are released
     window.addEventListener('keyup', () => {
         if (game.player) {
+            game.player.isMoving = false;
             game.player.dy = 0;
             game.player.dx = 0;
         }

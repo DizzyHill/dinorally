@@ -28,7 +28,9 @@ export default class Player {
         this.color = color;
         this.baseSpeed = gameSpeed; 
         this.speed = gameSpeed;
+        this.raceStarted = gameSpeed > 0;
         this.boosted = false;
+        this.isMoving = false;
         this.isJumping = false;
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
@@ -44,7 +46,9 @@ export default class Player {
 
         document.addEventListener('keydown', (event) => {
             if (event.key === ' ') {
+                if (!this.isJumping) {
                 this.jump();
+                }
             }
         });
   }
@@ -77,6 +81,8 @@ export default class Player {
   }
 
   update() {
+    console.log("gmae Speed: " + this.speed);
+    console.log("Player moving", this.isMoving);
     // Apply vertical oscillation to simulate running effect
     this.oscillationPhase += this.oscillationFrequency;
     this.y += Math.sin(this.oscillationPhase) * this.oscillationAmplitude;
@@ -106,23 +112,23 @@ export default class Player {
   }
 
   stall(delay = 1000) {
-    console.log("Bot Stalled");
+    console.log("Player Stalled");
     this.stalled = true;
     this.dx = 0;
     setTimeout(() => {
-        console.log("Bot Unstalled");
+        console.log("Player Unstalled");
         this.stalled = false;  // Recover after being stalled
         this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
     }, delay); // Stall for 1 second by default
   }
 
   jump() {
-    if (!this.isJumping) {
+    if ((!this.isJumping) && this.speed > 0) {
         console.log("Jumping", (this.speed * 1000) / 5);
         let originalPosition = this.y;
         let hangTime = (this.speed * 1000) / 5;
         this.dx += hangTime / 20;
-        this.dy -= 25;
+        this.dy -= 15;
         console.log(this.y);
         this.isJumping = true;
         setTimeout(() => {

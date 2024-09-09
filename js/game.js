@@ -169,6 +169,29 @@ export default class Game {
                 if (this.detectCollision(this.player, obj)) {
                     console.log("You hit a bot.");
                 }
+                
+                this.boosts.forEach((boost, boostIndex) => {
+                    if (this.detectCollision(obj, boost)) {
+                        obj.boosted = true;
+                        const originalSpeed = this.gameSpeed;
+                        this.gameSpeed *= 4;
+                        this.updateSpeeds();
+                        boost.boostSound.play();
+        
+                        setTimeout(() => {
+                            this.gameSpeed = originalSpeed;
+                            this.updateSpeeds();
+                        }, 1000);
+                        this.boosts.splice(boostIndex, 1);
+                    }
+                });
+
+                this.jumps.forEach((jump, jumpIndex) => {
+                    if (this.detectCollision(obj, jump)) {
+                        obj.jump();
+                        this.jumps.splice(jumpIndex, 1);
+                    }
+                });
 
                 this.coins.forEach((coin, coinIndex) => {
                     if (this.detectCollision(obj, coin)) {

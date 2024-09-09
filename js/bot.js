@@ -27,6 +27,7 @@ export default class Bot {
     this.gameHeight = gameHeight;
     this.color = 'gray'; // or any color you prefer
     this.baseSpeed = gameSpeed;
+    this.raceStarted = gameSpeed > 0;
     this.isJumping = false;
     this.boosted = false;
     this.boostSpeed = Math.random() > 0.5; // Randomly boost speed
@@ -62,7 +63,6 @@ export default class Bot {
         this.speed += Math.random() * 2 - 1; // Adjust speed randomly (pass or fall behind)
         this.dx = this.speed;
       }
-      this.dx = this.speed;
       this.x += this.dx;
     }
     
@@ -119,10 +119,34 @@ export default class Bot {
     console.log("Bot Stalled");
     this.stalled = true;
     this.dx = 0;
+    let blinkInterval = 200; // blink every 200ms
+    let blinkCount = 3;
+    let blinkTimeout = setInterval(() => {
+      this.image.style.visibility = (blinkCount % 2 === 0) ? 'hidden' : 'visible';
+      blinkCount++;
+      console.log("Bot Blinking", this.image.style.visibility);
+    }, blinkInterval);
+    clearInterval(blinkTimeout); // stop blinking
+    this.image.style.visibility = 'visible'; // make sure the bot is visible again
     setTimeout(() => {
-        console.log("Bot Unstalled");
-        this.stalled = false;  // Recover after being stalled
-        this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
+      console.log("Bot Unstalled");
+      this.stalled = false;  // Recover after being stalled
+      this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
     }, delay); // Stall for 1 second by default
+  }
+  
+  jump() {
+    if ((!this.isJumping) && this.speed > 0) {
+        let originalPosition = this.y;
+        let hangTime = (this.speed * 1000) / 5;
+        this.dx += hangTime / 20;
+        this.dy -= 15;
+        console.log(this.y);
+        this.isJumping = true;
+        setTimeout(() => {
+            this.isJumping = false;
+            this.y = originalPosition;
+        }, hangTime);
+    }
   }
 }
