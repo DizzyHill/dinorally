@@ -1,4 +1,6 @@
 // player.js
+import {Tween, Easing} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
+
 export default class Player {
   constructor(dinoName, color, gameHeight, gameSpeed, gameWidth) {
         this.width = 100;
@@ -37,9 +39,14 @@ export default class Player {
         this.oscillationAmplitude = 0.03; // Vertical oscillation amplitude
         this.oscillationFrequency = 0.05; // Vertical oscillation frequency
         this.oscillationPhase = 0; // Initial phase for oscillation
-
         this.image = new Image();
         this.image.src = `./assets/${dinoName}.png`;
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === ' ') {
+                this.jump();
+            }
+        });
   }
 
   draw(ctx) {
@@ -75,6 +82,7 @@ export default class Player {
     this.y += Math.sin(this.oscillationPhase) * this.oscillationAmplitude;
     this.x += this.dx;
     this.y += this.dy;
+    
 
     // Block Player from going to the top part of the screen 
     if (!this.isJumping && this.y < this.boundaryTop) this.y = this.boundaryTop;
@@ -89,4 +97,53 @@ export default class Player {
         this.x = this.boundaryRight;
     }
   }
+
+  boost(boostTime = 1000) {
+    this.boosted = true;
+    setTimeout(() => {
+      this.boosted = false;
+    }, boostTime);
+  }
+
+  stall(delay = 1000) {
+    console.log("Bot Stalled");
+    this.stalled = true;
+    this.dx = 0;
+    setTimeout(() => {
+        console.log("Bot Unstalled");
+        this.stalled = false;  // Recover after being stalled
+        this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
+    }, delay); // Stall for 1 second by default
+  }
+
+  jump() {
+    if (!this.isJumping) {
+        console.log("Jumping", (this.speed * 1000) / 5);
+        let originalPosition = this.y;
+        let hangTime = (this.speed * 1000) / 5;
+        this.dx += hangTime / 20;
+        this.dy -= 25;
+        console.log(this.y);
+        this.isJumping = true;
+        setTimeout(() => {
+            this.isJumping = false;
+            this.y = originalPosition;
+        }, hangTime);
+    }
+  }
+    // jump() {
+    //     if (!this.isJumping) {
+    //     console.log("Jumping");
+    //     this.isJumping = true;
+    //     const jumpTween = new Tween(this)
+    //     .to({ y: this.y - 100 }, 500, Easing.Cubic.Out)
+    //     .to({ y: this.y }, 500, Easing.Cubic.In)
+    //     .onUpdate(() => {
+    //         this.y = jumpTween.get('y'); // update the player's position
+    //         console.log(this.y);
+
+    //     });
+    //     jumpTween.start();
+    //     }
+    // }
 }

@@ -8,7 +8,7 @@ export default class Jump {
   }
 
   draw(ctx) {
-      ctx.fillStyle = 'orange';
+      ctx.fillStyle = 'pink';
       ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 

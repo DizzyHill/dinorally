@@ -51,7 +51,7 @@ export default class Bot {
 
   update() {
 
-    console.log("Bot Speed:" + this.speed + "Bot pos: " + this.x);
+    // console.log("Bot Speed:" + this.speed + "Bot pos: " + this.x);
 
     if (this.stalled) {
       // If the bot is stalled, it remains at its position temporarily

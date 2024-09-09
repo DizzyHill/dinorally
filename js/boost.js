@@ -7,6 +7,8 @@ export default class Boost {
       this.speed = gameSpeed;
       this.image = new Image();
       this.image.src = './assets/DR_VG_Chevron(300x200).png';
+      this.boostSound = new Audio('./assets/sounds/powerup.mp3');
+      this.boostSound.volume = 0.5;  // Set volume (optional)
   }
 
   draw(ctx) {
@@ -20,5 +22,9 @@ export default class Boost {
 
   update() {
       this.x -= this.speed;
+  }
+
+  playBoostSound() {
+    this.boostSound.play();
   }
 }

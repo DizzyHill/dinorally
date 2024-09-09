@@ -102,7 +102,7 @@ export default class Game {
     
     spawnObjects() {
         if (Math.random() < 0.5) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
-        if (Math.random() < 0.06) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
+        if (Math.random() < 0.1) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.05) this.boosts.push(new Boost(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.15) this.coins.push(new Coin(this.gameWidth, this.gameHeight, this.gameSpeed));
 
@@ -124,41 +124,73 @@ export default class Game {
         this.backgroundSpeed = this.gameSpeed * 1.5; // Adjust background speed
         this.updateObjectSpeeds(); // Update speeds for all game objects
     }
+    
+    updateObjects(objects) {
+        objects.forEach((obj, index) => {
+            obj.update();
+            obj.draw(this.ctx);
 
-    drawDifficulty() {
-        const text = `Difficulty: ${this.difficulty_level}`;
-        const fontSize = 20;
-        const padding = 10;
-        const boxWidth = 180;
-        const boxHeight = 40;
-        const x = 20;  // Position near the left edge
-        const y = 10;  // Position near the top edge
-    
-        // Set up text style
-        this.ctx.font = `${fontSize}px Arial`;
-        this.ctx.fillStyle = 'black';
-    
-        // Draw rounded white box
-        this.ctx.beginPath();
-        this.ctx.moveTo(x + 10, y); // Start at top-left corner with rounding
-        this.ctx.lineTo(x + boxWidth - 10, y); // Top line
-        this.ctx.quadraticCurveTo(x + boxWidth, y, x + boxWidth, y + 10); // Top-right corner
-        this.ctx.lineTo(x + boxWidth, y + boxHeight - 10); // Right side
-        this.ctx.quadraticCurveTo(x + boxWidth, y + boxHeight, x + boxWidth - 10, y + boxHeight); // Bottom-right corner
-        this.ctx.lineTo(x + 10, y + boxHeight); // Bottom line
-        this.ctx.quadraticCurveTo(x, y + boxHeight, x, y + boxHeight - 10); // Bottom-left corner
-        this.ctx.lineTo(x, y + 10); // Left side
-        this.ctx.quadraticCurveTo(x, y, x + 10, y); // Top-left corner
-        this.ctx.closePath();
-    
-        this.ctx.fillStyle = 'white'; // White background for the box
-        this.ctx.fill();
-    
-        // Draw difficulty level text inside the box
-        this.ctx.fillStyle = 'black'; // Set text color to black
-        this.ctx.fillText(text, x + padding, y + 27); // Position text inside the box
+            // Boost
+            if (obj instanceof Boost && this.detectCollision(this.player, obj)) {
+                this.player.boosted = true;
+                const originalSpeed = this.gameSpeed;
+                this.gameSpeed *= 4;
+                this.updateSpeeds();
+                obj.boostSound.play();
+
+                setTimeout(() => {
+                    this.gameSpeed = originalSpeed;
+                    this.updateSpeeds();
+                }, 1000);
+                objects.splice(index, 1);
+            }
+            
+            // Coin
+            if (obj instanceof Coin && this.detectCollision(this.player, obj)) {
+                this.coinCount++;
+                // Play the coin sound
+                obj.playCoinSound();
+                objects.splice(index, 1);
+            }
+
+            // Jump
+            if (obj instanceof Jump && this.detectCollision(this.player, obj)) {
+                this.player.jump();
+                objects.splice(index, 1);
+            }
+
+            // Obstacle
+            if (obj instanceof Obstacle && this.detectCollision(this.player, obj)) {
+                this.isGameRunning = false;
+            }
+
+            // Bot
+            if (obj instanceof Bot) {
+                if (this.detectCollision(this.player, obj)) {
+                    console.log("You hit a bot.");
+                }
+
+                this.coins.forEach((coin, coinIndex) => {
+                    if (this.detectCollision(obj, coin)) {
+                        this.coins.splice(coinIndex, 1);  // Remove the coin from the game
+                    }
+                });
+
+                this.obstacles.forEach((obstacle, obstacleIndex) => {
+                    if (this.detectCollision(obj, obstacle)) {
+                        obj.stall(); // Stall the bot when it hits an obstacle
+                        this.obstacles.splice(obstacleIndex, 1);
+                    }
+                });
+            }
+
+            if (obj.x + obj.width < 0) {
+                if (!(obj instanceof Bot)) {
+                    objects.splice(index, 1);
+                }   
+            }
+        });
     }
-    
 
     updateObjectSpeeds() {
         this.obstacles.forEach(obstacle => obstacle.speed = this.gameSpeed);
@@ -245,69 +277,38 @@ export default class Game {
         this.ctx.fillText(text, x + padding, y + 27); // Position text inside the box
     }
 
-    updateObjects(objects) {
-        objects.forEach((obj, index) => {
-            obj.update();
-            obj.draw(this.ctx);
-
-            // Boost
-            if (obj instanceof Boost && this.detectCollision(this.player, obj)) {
-                this.player.boosted = true;
-                const originalSpeed = this.gameSpeed;
-                this.gameSpeed *= 4;
-                this.updateSpeeds();
-
-                setTimeout(() => {
-                    this.gameSpeed = originalSpeed;
-                    this.updateSpeeds();
-                }, 1000);
-                objects.splice(index, 1);
-            }
-            
-            // Coin
-            if (obj instanceof Coin && this.detectCollision(this.player, obj)) {
-                this.coinCount++;
-                // Play the coin sound
-                obj.playCoinSound();
-                objects.splice(index, 1);
-            }
-
-            // Jump
-            if (obj instanceof Jump && this.detectCollision(this.player, obj)) {
-                objects.splice(index, 1);
-            }
-
-            // Obstacle
-            if (obj instanceof Obstacle && this.detectCollision(this.player, obj)) {
-                this.isGameRunning = false;
-            }
-
-            // Bot
-            if (obj instanceof Bot) {
-                if (this.detectCollision(this.player, obj)) {
-                    console.log("You hit a bot.");
-                }
-
-                this.coins.forEach((coin, coinIndex) => {
-                    if (this.detectCollision(obj, coin)) {
-                        this.coins.splice(coinIndex, 1);  // Remove the coin from the game
-                    }
-                });
-
-                this.obstacles.forEach((obstacle, obstacleIndex) => {
-                    if (this.detectCollision(obj, obstacle)) {
-                        obj.stall(); // Stall the bot when it hits an obstacle
-                        this.obstacles.splice(obstacleIndex, 1);
-                    }
-                });
-            }
-
-            if (obj.x + obj.width < 0) {
-                if (!(obj instanceof Bot)) {
-                    objects.splice(index, 1);
-                }   
-            }
-        });
+    drawDifficulty() {
+        const text = `Difficulty: ${this.difficulty_level}`;
+        const fontSize = 20;
+        const padding = 10;
+        const boxWidth = 180;
+        const boxHeight = 40;
+        const x = 20;  // Position near the left edge
+        const y = 10;  // Position near the top edge
+    
+        // Set up text style
+        this.ctx.font = `${fontSize}px Arial`;
+        this.ctx.fillStyle = 'black';
+    
+        // Draw rounded white box
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + 10, y); // Start at top-left corner with rounding
+        this.ctx.lineTo(x + boxWidth - 10, y); // Top line
+        this.ctx.quadraticCurveTo(x + boxWidth, y, x + boxWidth, y + 10); // Top-right corner
+        this.ctx.lineTo(x + boxWidth, y + boxHeight - 10); // Right side
+        this.ctx.quadraticCurveTo(x + boxWidth, y + boxHeight, x + boxWidth - 10, y + boxHeight); // Bottom-right corner
+        this.ctx.lineTo(x + 10, y + boxHeight); // Bottom line
+        this.ctx.quadraticCurveTo(x, y + boxHeight, x, y + boxHeight - 10); // Bottom-left corner
+        this.ctx.lineTo(x, y + 10); // Left side
+        this.ctx.quadraticCurveTo(x, y, x + 10, y); // Top-left corner
+        this.ctx.closePath();
+    
+        this.ctx.fillStyle = 'white'; // White background for the box
+        this.ctx.fill();
+    
+        // Draw difficulty level text inside the box
+        this.ctx.fillStyle = 'black'; // Set text color to black
+        this.ctx.fillText(text, x + padding, y + 27); // Position text inside the box
     }
 
     gameLoop() {
@@ -316,7 +317,7 @@ export default class Game {
             return;
         }
 
-        this.ctx.clearRect(0, 0, this.gameWidth, this.gameHeight);
+        // this.ctx.clearRect(0, 0, this.gameWidth, this.gameHeight);
 
         this.drawBackground();
         this.updateObjects(this.bots);
