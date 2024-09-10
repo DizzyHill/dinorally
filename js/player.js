@@ -44,19 +44,75 @@ export default class Player {
         this.oscillationAmplitude = 0.03; // Vertical oscillation amplitude
         this.oscillationFrequency = 0.05; // Vertical oscillation frequency
         this.oscillationPhase = 0; // Initial phase for oscillation
+
+        this.shadowBaseWidth = this.width * 0.8;  // Base size of the shadow
+        this.shadowBaseHeight = this.height * 0.2; // Base height of the shadow
+
         this.image = new Image();
         this.image.src = `./assets/${dinoName}.png`;
+  }
 
-        // document.addEventListener('keydown', (event) => {
-        //     if (event.key === ' ') {
-        //         if (!this.isJumping) {
-        //         this.jump();
-        //         }
-        //     }
-        // });
+  drawShadow(ctx) {
+    // Determine if the player is jumping
+    const shadowY = this.isJumping ? this.shadowFixedY : (this.y + this.height);  // Lock shadow Y position if jumping
+
+    // Scale the shadow based on the player's jump height
+    let shadowScale = 1 - Math.abs(this.y - this.shadowFixedY) / 200;  // Adjust shadow scale based on player's height during jump
+    
+    // Clamp shadowScale between 0.5 and 1 to ensure it doesn't shrink too much
+    shadowScale = Math.max(0.5, Math.min(1, shadowScale));
+
+    // Calculate the shadow's width and height based on the scale
+    const shadowWidth = this.width * shadowScale;
+    const shadowHeight = 10 * shadowScale;  // Fixed shadow height for a more flattened look
+
+    // Draw the shadow
+    ctx.beginPath();
+    ctx.ellipse(
+        this.x + this.width / 2,    // Shadow is centered horizontally with the player
+        shadowY,                    // Shadow Y position (fixed when jumping)
+        shadowWidth / 2,
+        shadowHeight / 2,
+        0,
+        0,
+        2 * Math.PI
+    );
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';  // Semi-transparent black shadow
+    ctx.fill();
+  }
+  drawShadow(ctx) {
+    // Determine if the player is jumping
+    const shadowY = this.isJumping ? this.shadowFixedY : (this.y + this.height);
+    
+    // Scale the shadow based on the player's jump height
+    let shadowScale = 1 - Math.abs(this.y - this.gameHeight / 2) / 200; // Adjust shadow scale based on player's height (adjust the divisor for smoother scale)
+    
+    // Clamp shadowScale between 0.5 and 1 to ensure it doesn't shrink too much
+    shadowScale = Math.max(0.5, Math.min(1, shadowScale));
+
+    // Calculate the shadow's width and height based on the scale
+    const shadowWidth = this.shadowBaseWidth * shadowScale;
+    const shadowHeight = this.shadowBaseHeight * shadowScale;
+
+    // Draw the shadow directly underneath the player
+    ctx.beginPath();
+    ctx.ellipse(
+      this.x + this.width / 2,    // Shadow is centered horizontally with the player
+      shadowY,                    // Shadow Y position (fixed when jumping)
+      shadowWidth / 2,
+      shadowHeight / 2,
+      0,
+      0,
+      2 * Math.PI
+    );
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';  // Semi-transparent black shadow
+    ctx.fill();
   }
 
   draw(ctx) {
+    // Draw the shadow first (beneath the player)
+    this.drawShadow(ctx);
+
     if (this.image.complete) {
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     } else {
@@ -65,22 +121,22 @@ export default class Player {
     }
 
     // Visualize the hitbox around the player
-    ctx.strokeStyle = 'red'; // Color of the hitbox line
-    ctx.lineWidth = 2; // Thickness of the hitbox line
+    // ctx.strokeStyle = 'red'; // Color of the hitbox line
+    // ctx.lineWidth = 2; // Thickness of the hitbox line
 
-    // Draw the original full player hitbox
-    ctx.strokeRect(this.x, this.y, this.width, this.height);
+    // // Draw the original full player hitbox
+    // ctx.strokeRect(this.x, this.y, this.width, this.height);
 
-    // Optional: Draw a reduced hitbox for more precise collision detection
-    const paddingX = this.width * 0.25;
-    const paddingY = this.height * 0.25;
-    ctx.strokeStyle = 'green'; // Different color for the reduced hitbox
-    ctx.strokeRect(
-        this.x + paddingX / 2, // Apply horizontal padding
-        this.y + paddingY / 2, // Apply vertical padding
-        this.width - paddingX,  // Adjust width for padding
-        this.height - paddingY  // Adjust height for padding
-    );
+    // // Optional: Draw a reduced hitbox for more precise collision detection
+    // const paddingX = this.width * 0.25;
+    // const paddingY = this.height * 0.25;
+    // ctx.strokeStyle = 'green'; // Different color for the reduced hitbox
+    // ctx.strokeRect(
+    //     this.x + paddingX / 2, // Apply horizontal padding
+    //     this.y + paddingY / 2, // Apply vertical padding
+    //     this.width - paddingX,  // Adjust width for padding
+    //     this.height - paddingY  // Adjust height for padding
+    // );
   }
 
   // update() {
@@ -187,6 +243,10 @@ export default class Player {
     if (!this.isJumping) {  // Ensure jump happens only once per press
         console.log("Jumping");
         this.isJumping = true;  // Set jumping flag
+        
+        // Lock the shadow's y-position when the jump starts
+        this.shadowFixedY = this.y + this.height;
+        
         let originalY = this.y;
         let jumpHeight = 120;  // Adjust based on desired jump height
         let jumpDuration = 800;  // Time to complete the jump animation
