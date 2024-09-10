@@ -52,47 +52,24 @@ export default class Player {
         this.image.src = `./assets/${dinoName}.png`;
   }
 
-  drawShadow(ctx) {
-    // Determine if the player is jumping
-    const shadowY = this.isJumping ? this.shadowFixedY : (this.y + this.height);  // Lock shadow Y position if jumping
-
-    // Scale the shadow based on the player's jump height
-    let shadowScale = 1 - Math.abs(this.y - this.shadowFixedY) / 200;  // Adjust shadow scale based on player's height during jump
-    
-    // Clamp shadowScale between 0.5 and 1 to ensure it doesn't shrink too much
-    shadowScale = Math.max(0.5, Math.min(1, shadowScale));
-
-    // Calculate the shadow's width and height based on the scale
-    const shadowWidth = this.width * shadowScale;
-    const shadowHeight = 10 * shadowScale;  // Fixed shadow height for a more flattened look
-
-    // Draw the shadow
-    ctx.beginPath();
-    ctx.ellipse(
-        this.x + this.width / 2,    // Shadow is centered horizontally with the player
-        shadowY,                    // Shadow Y position (fixed when jumping)
-        shadowWidth / 2,
-        shadowHeight / 2,
-        0,
-        0,
-        2 * Math.PI
-    );
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';  // Semi-transparent black shadow
-    ctx.fill();
-  }
+  // Draw the shadow beneath the player
   drawShadow(ctx) {
     // Determine if the player is jumping
     const shadowY = this.isJumping ? this.shadowFixedY : (this.y + this.height);
     
-    // Scale the shadow based on the player's jump height
-    let shadowScale = 1 - Math.abs(this.y - this.gameHeight / 2) / 200; // Adjust shadow scale based on player's height (adjust the divisor for smoother scale)
-    
-    // Clamp shadowScale between 0.5 and 1 to ensure it doesn't shrink too much
-    shadowScale = Math.max(0.5, Math.min(1, shadowScale));
+    let shadowScale = 1;
+    if (this.isJumping) {
+      // Scale the shadow based on the player's jump height
+      shadowScale = 1 - Math.abs(this.y - this.gameHeight / 2) / 200; // Adjust shadow scale based on player's height (adjust the divisor for smoother scale)
+      
+      // Clamp shadowScale between 0.5 and 1 to ensure it doesn't shrink too much
+      shadowScale = Math.max(0.5, Math.min(1, shadowScale));
+    }
 
     // Calculate the shadow's width and height based on the scale
     const shadowWidth = this.shadowBaseWidth * shadowScale;
     const shadowHeight = this.shadowBaseHeight * shadowScale;
+      
 
     // Draw the shadow directly underneath the player
     ctx.beginPath();
