@@ -1,5 +1,5 @@
 import { Tween, Easing, update as TWEENUpdate } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
-import Player from './player.js';
+import Racer from './racer.js';
 import Obstacle from './obstacle.js';
 // import Jump from './jump.js';
 import Boost from './boost.js';
@@ -24,12 +24,7 @@ export default class Game {
         this.coins = [];
         this.isGameRunning = false;
         this.coinCount = 0;
-        this.dinos = {
-            Nitro: { color: 'red' },
-            Comet: { color: 'blue' },
-            Fuego: { color: 'green' },
-            Bash: { color: 'yellow' }
-        };
+        this.dinos = [ "Nitro", "Comet", "Fuego", "Bash" ];
         this.backgroundImage = new Image();
         this.backgroundImage.src = './assets/VG_BackGround_2.png'; // Replace with your background image path
         this.bgX = 0;
@@ -45,7 +40,7 @@ export default class Game {
 
     startGame(dinoName) {
         document.getElementById('character-selection').style.display = 'none';
-        this.player = new Player(dinoName, this.dinos[dinoName].color, this.gameHeight, this.gameSpeed, this.gameWidth); //Build the player object
+        this.player = new Racer(dinoName, this.gameHeight, this.gameSpeed, this.gameWidth); //Build the player object
         this.gameSpeed = 0;
         this.obstacles = [];
         this.boosts = [];
@@ -93,7 +88,7 @@ export default class Game {
     
         return Array.from({ length: numBots }, () => {
             const randomDinoName = dinoNames[Math.floor(Math.random() * dinoNames.length)]; // Pick a random dino name
-            return new Bot(randomDinoName, this.gameWidth, this.gameHeight, this.gameSpeed); // Pass random dino name to BotRacer
+            return new Racer(randomDinoName, this.gameHeight, this.gameSpeed, this.gameWidth); // Pass random dino name to BotRacer
         });
     }
     
@@ -307,6 +302,10 @@ export default class Game {
         this.ctx.fillStyle = 'black'; // Set text color to black
         this.ctx.fillText(text, x + padding, y + 27); // Position text inside the box
     }
+    
+    sortByYPosition(a, b) {
+        return a.y - b.y;  // Objects with lower 'y' values will be drawn first
+    }
 
     gameLoop() {
         if (!this.isGameRunning) {
@@ -314,18 +313,33 @@ export default class Game {
             return;
         }
 
-        // this.ctx.clearRect(0, 0, this.gameWidth, this.gameHeight);
+        // Clear the canvas
+        this.ctx.clearRect(0, 0, this.gameWidth, this.gameHeight);
 
+        // Draw the background
         this.drawBackground();
-        this.updateObjects(this.bots);
-        this.player.update();
-        this.player.draw(this.ctx);
-        this.drawCoinTally();
-        this.drawDifficulty();
+        
         this.updateObjects(this.obstacles);
         this.updateObjects(this.boosts);
-        // this.updateObjects(this.jumps);
         this.updateObjects(this.coins);
+
+        // Combine the player and bots into a single array for sorting
+        const entities = [...this.bots, this.player];
+
+        // Sort entities based on their y position
+        entities.sort((a, b) => a.y - b.y);
+
+        // Draw entities in the correct order
+        entities.forEach(entity => {
+            entity.update();
+            entity.draw(this.ctx);
+        });
+        // this.updateObjects(this.bots);
+        // this.player.update();
+        // this.player.draw(this.ctx);
+        this.drawCoinTally();
+        this.drawDifficulty();
+        
         requestAnimationFrame(this.gameLoop.bind(this));
         TWEENUpdate();
     }

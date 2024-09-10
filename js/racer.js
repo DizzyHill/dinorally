@@ -1,26 +1,31 @@
 // player.js
 import { Tween, Easing } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 
-export default class Player {
-  constructor(dinoName, color, gameHeight, gameSpeed, gameWidth) {
+export default class Racer {
+  constructor(dinoName, gameHeight, gameSpeed, gameWidth, isBot = false) {
         this.width = 100;
         this.height = 75;
         if (dinoName === 'Bash') {
             this.height = 120;
             this.width = 100;
+            this.color = 'red';
         }
         if (dinoName === 'Comet') {
             this.height = 110;
             this.width = 124.4;
+            this.color = 'blue';
         }
         if (dinoName === 'Fuego') {
             this.height = 100;
             this.width = 112.2;
+            this.color = 'green';
         }
         if (dinoName === 'Nitro') {
             this.height = 100;
             this.width = 144;
+            this.color = 'yellow';
         }
+        this.isBot = isBot;
         this.x = 50;
         this.y = gameHeight / 2 - this.height / 2;
         this.dy = 0;
@@ -28,7 +33,6 @@ export default class Player {
         this.acceleration = 1.5;  // How fast the player accelerates
         this.friction = 0.1;      // How quickly the player decelerates when the key is released
         this.maxSpeed = 4;        // Maximum speed the player can reach
-        this.color = color;
         this.baseSpeed = gameSpeed; 
         this.speed = gameSpeed;
         this.raceStarted = gameSpeed > 0;
@@ -51,6 +55,18 @@ export default class Player {
         this.image = new Image();
         this.image.src = `./assets/${dinoName}.png`;
   }
+
+  botAI() {
+    // Add simple AI behavior for bots
+    // Example: Move forward with a small chance of jumping
+    this.x += this.speed;
+
+    // Random jump logic for bots
+    if (Math.random() < 0.01) {
+        this.jump();
+    }
+  }
+
 
   // Draw the shadow beneath the player
   drawShadow(ctx) {
@@ -140,6 +156,10 @@ export default class Player {
   //   }
   // }
   update() {
+    if (this.isBot) {
+      this.botAI(); // Bots will have automated movement logic
+    }
+
     if (!this.isMoving) {
         // Apply friction (deceleration) when not moving
         if (this.dx > 0) {
@@ -206,13 +226,22 @@ export default class Player {
   }
 
   stall(delay = 1000) {
-    console.log("Player Stalled");
+    console.log(this.dinoName +" Stalled");
     this.stalled = true;
     this.dx = 0;
+    let blinkInterval = 200; // blink every 200ms
+    let blinkCount = 3;
+    let blinkTimeout = setInterval(() => {
+      this.image.style.visibility = (blinkCount % 2 === 0) ? 'hidden' : 'visible';
+      blinkCount++;
+      console.log("Bot Blinking", this.image.style.visibility);
+    }, blinkInterval);
+    clearInterval(blinkTimeout); // stop blinking
+    this.image.style.visibility = 'visible'; // make sure the bot is visible again
     setTimeout(() => {
-        console.log("Player Unstalled");
-        this.stalled = false;  // Recover after being stalled
-        this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
+      console.log(this.dinoName +" Unstalled");
+      this.stalled = false;  // Recover after being stalled
+      this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
     }, delay); // Stall for 1 second by default
   }
 
