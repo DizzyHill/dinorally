@@ -25,6 +25,9 @@ export default class Player {
         this.y = gameHeight / 2 - this.height / 2;
         this.dy = 0;
         this.dx = 0;
+        this.acceleration = 1.5;  // How fast the player accelerates
+        this.friction = 0.1;      // How quickly the player decelerates when the key is released
+        this.maxSpeed = 4;        // Maximum speed the player can reach
         this.color = color;
         this.baseSpeed = gameSpeed; 
         this.speed = gameSpeed;
@@ -44,13 +47,13 @@ export default class Player {
         this.image = new Image();
         this.image.src = `./assets/${dinoName}.png`;
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key === ' ') {
-                if (!this.isJumping) {
-                this.jump();
-                }
-            }
-        });
+        // document.addEventListener('keydown', (event) => {
+        //     if (event.key === ' ') {
+        //         if (!this.isJumping) {
+        //         this.jump();
+        //         }
+        //     }
+        // });
   }
 
   draw(ctx) {
@@ -61,35 +64,69 @@ export default class Player {
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 
-    // // Visualize the hitbox around the player
-    // ctx.strokeStyle = 'red'; // Color of the hitbox line
-    // ctx.lineWidth = 2; // Thickness of the hitbox line
+    // Visualize the hitbox around the player
+    ctx.strokeStyle = 'red'; // Color of the hitbox line
+    ctx.lineWidth = 2; // Thickness of the hitbox line
 
-    // // Draw the original full player hitbox
-    // ctx.strokeRect(this.x, this.y, this.width, this.height);
+    // Draw the original full player hitbox
+    ctx.strokeRect(this.x, this.y, this.width, this.height);
 
-    // // Optional: Draw a reduced hitbox for more precise collision detection
-    // const paddingX = this.width * 0.25;
-    // const paddingY = this.height * 0.25;
-    // ctx.strokeStyle = 'green'; // Different color for the reduced hitbox
-    // ctx.strokeRect(
-    //     this.x + paddingX / 2, // Apply horizontal padding
-    //     this.y + paddingY / 2, // Apply vertical padding
-    //     this.width - paddingX,  // Adjust width for padding
-    //     this.height - paddingY  // Adjust height for padding
-    // );
+    // Optional: Draw a reduced hitbox for more precise collision detection
+    const paddingX = this.width * 0.25;
+    const paddingY = this.height * 0.25;
+    ctx.strokeStyle = 'green'; // Different color for the reduced hitbox
+    ctx.strokeRect(
+        this.x + paddingX / 2, // Apply horizontal padding
+        this.y + paddingY / 2, // Apply vertical padding
+        this.width - paddingX,  // Adjust width for padding
+        this.height - paddingY  // Adjust height for padding
+    );
   }
 
-  update() {
-    // console.log("gmae Speed: " + this.speed);
-    // console.log("Player moving", this.isMoving);
-    // Apply vertical oscillation to simulate running effect
-    this.oscillationPhase += this.oscillationFrequency;
-    this.y += Math.sin(this.oscillationPhase) * this.oscillationAmplitude;
-    this.x += this.dx;
-    this.y += this.dy;
+  // update() {
+  //   // console.log("gmae Speed: " + this.speed);
+  //   // console.log("Player moving", this.isMoving);
+  //   // Apply vertical oscillation to simulate running effect
+  //   this.oscillationPhase += this.oscillationFrequency;
+  //   this.y += Math.sin(this.oscillationPhase) * this.oscillationAmplitude;
+  //   this.x += this.dx;
+  //   this.y += this.dy;
     
 
+  //   // Block Player from going to the top part of the screen 
+  //   if (!this.isJumping && this.y < this.boundaryTop) this.y = this.boundaryTop;
+  //   // Block Player from going past the bottom part of the screen
+  //   if (this.y > this.boundaryBottom) this.y = this.boundaryBottom;
+  //   // Block Player from going past the left part of the screen
+  //   if (this.x < this.boundaryLeft) {
+  //       this.x = this.boundaryLeft;
+  //   }
+  //   // Block Player from going past the right part of the screen
+  //   if (this.x > this.boundaryRight) {
+  //       this.x = this.boundaryRight;
+  //   }
+  // }
+  update() {
+    if (!this.isMoving) {
+        // Apply friction (deceleration) when not moving
+        if (this.dx > 0) {
+            this.dx = Math.max(0, this.dx - this.friction);
+        } else if (this.dx < 0) {
+            this.dx = Math.min(0, this.dx + this.friction);
+        }
+
+        if (this.dy > 0) {
+            this.dy = Math.max(0, this.dy - this.friction);
+        } else if (this.dy < 0) {
+            this.dy = Math.min(0, this.dy + this.friction);
+        }
+    }
+
+    // Update player position
+    this.x += this.dx;
+    this.y += this.dy;
+
+    // Keep the player within the game bounds (example)
     // Block Player from going to the top part of the screen 
     if (!this.isJumping && this.y < this.boundaryTop) this.y = this.boundaryTop;
     // Block Player from going past the bottom part of the screen
@@ -102,6 +139,30 @@ export default class Player {
     if (this.x > this.boundaryRight) {
         this.x = this.boundaryRight;
     }
+  }
+
+  moveUp() {
+      if (this.dy > -this.maxSpeed) {
+          this.dy -= this.acceleration;  // Accelerate upwards
+      }
+  }
+
+  moveDown() {
+      if (this.dy < this.maxSpeed) {
+          this.dy += this.acceleration;  // Accelerate downwards
+      }
+  }
+
+  moveLeft() {
+      if (this.dx > -this.maxSpeed) {
+          this.dx -= this.acceleration;  // Accelerate left
+      }
+  }
+
+  moveRight() {
+      if (this.dx < this.maxSpeed) {
+          this.dx += this.acceleration;  // Accelerate right
+      }
   }
 
   boost(boostTime = 1000) {
@@ -148,19 +209,4 @@ export default class Player {
         upTween.start();
     }
   }
-    // jump() {
-    //     if (!this.isJumping) {
-    //     console.log("Jumping");
-    //     this.isJumping = true;
-    //     const jumpTween = new Tween(this)
-    //     .to({ y: this.y - 100 }, 500, Easing.Cubic.Out)
-    //     .to({ y: this.y }, 500, Easing.Cubic.In)
-    //     .onUpdate(() => {
-    //         this.y = jumpTween.get('y'); // update the player's position
-    //         console.log(this.y);
-
-    //     });
-    //     jumpTween.start();
-    //     }
-    // }
 }

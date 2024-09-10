@@ -21,7 +21,6 @@ export default class Game {
         this.difficulty_level = 2;
         this.obstacles = [];
         this.boosts = [];
-        // this.jumps = [];
         this.coins = [];
         this.isGameRunning = false;
         this.coinCount = 0;
@@ -50,7 +49,6 @@ export default class Game {
         this.gameSpeed = 0;
         this.obstacles = [];
         this.boosts = [];
-        // this.jumps = [];
         this.coins = [];
         this.isGameRunning = true;
         this.coinCount = 0;
@@ -69,8 +67,6 @@ export default class Game {
             this.bots.stalled = false;
             this.spawnObjects();
             this.increaseDifficulty();  // Start increasing game speed
-            
-
             // Start playing the theme music when the game starts
             this.themeMusic.play();
         }, 3000);
@@ -103,7 +99,6 @@ export default class Game {
     
     spawnObjects() {
         if (Math.random() < 0.5) this.obstacles.push(new Obstacle(this.gameWidth, this.gameHeight, this.gameSpeed));
-        // if (Math.random() < 0.1) this.jumps.push(new Jump(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.05) this.boosts.push(new Boost(this.gameWidth, this.gameHeight, this.gameSpeed));
         if (Math.random() < 0.15) this.coins.push(new Coin(this.gameWidth, this.gameHeight, this.gameSpeed));
 
@@ -154,12 +149,6 @@ export default class Game {
                 objects.splice(index, 1);
             }
 
-            // // Jump
-            // if (obj instanceof Jump && this.detectCollision(this.player, obj)) {
-            //     this.player.jump();
-            //     objects.splice(index, 1);
-            // }
-
             // Obstacle
             if (obj instanceof Obstacle && this.detectCollision(this.player, obj)) {
                 this.isGameRunning = false;
@@ -173,26 +162,11 @@ export default class Game {
                 
                 this.boosts.forEach((boost, boostIndex) => {
                     if (this.detectCollision(obj, boost)) {
-                        obj.boosted = true;
-                        const originalSpeed = this.gameSpeed;
-                        this.gameSpeed *= 4;
-                        this.updateSpeeds();
-                        boost.boostSound.play();
-        
-                        setTimeout(() => {
-                            this.gameSpeed = originalSpeed;
-                            this.updateSpeeds();
-                        }, 1000);
+                        obj.boost();
+                        
                         this.boosts.splice(boostIndex, 1);
                     }
                 });
-
-                // this.jumps.forEach((jump, jumpIndex) => {
-                //     if (this.detectCollision(obj, jump)) {
-                //         obj.jump();
-                //         this.jumps.splice(jumpIndex, 1);
-                //     }
-                // });
 
                 this.coins.forEach((coin, coinIndex) => {
                     if (this.detectCollision(obj, coin)) {
@@ -219,7 +193,6 @@ export default class Game {
     updateObjectSpeeds() {
         this.obstacles.forEach(obstacle => obstacle.speed = this.gameSpeed);
         this.boosts.forEach(boost => boost.speed = this.gameSpeed);
-        // this.jumps.forEach(jump => jump.speed = this.gameSpeed);
         this.coins.forEach(coin => coin.speed = this.gameSpeed);
         this.bots.forEach(bot => bot.speed = this.gameSpeed);
     }
