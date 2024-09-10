@@ -50,6 +50,7 @@ export default class Player {
 
         this.image = new Image();
         this.image.src = `./assets/${dinoName}.png`;
+        // sdsadfasdf??
   }
 
   // Draw the shadow beneath the player
