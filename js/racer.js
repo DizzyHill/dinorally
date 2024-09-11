@@ -3,57 +3,86 @@ import { Tween, Easing } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/t
 
 export default class Racer {
   constructor(dinoName, gameHeight, gameSpeed, gameWidth, isBot = false) {
+    this.width = 100;
+    this.height = 75;
+    if (dinoName === 'Bash') {
+        this.height = 120;
         this.width = 100;
-        this.height = 75;
-        if (dinoName === 'Bash') {
-            this.height = 120;
-            this.width = 100;
-            this.color = 'red';
-        }
-        if (dinoName === 'Comet') {
-            this.height = 110;
-            this.width = 124.4;
-            this.color = 'blue';
-        }
-        if (dinoName === 'Fuego') {
-            this.height = 100;
-            this.width = 112.2;
-            this.color = 'green';
-        }
-        if (dinoName === 'Nitro') {
-            this.height = 100;
-            this.width = 144;
-            this.color = 'yellow';
-        }
-        this.isBot = isBot;
-        this.x = 50;
-        this.y = gameHeight / 2 - this.height / 2;
-        this.dy = 0;
-        this.dx = 0;
-        this.acceleration = 1.5;  // How fast the player accelerates
-        this.friction = 0.1;      // How quickly the player decelerates when the key is released
-        this.maxSpeed = 4;        // Maximum speed the player can reach
-        this.baseSpeed = gameSpeed; 
-        this.speed = gameSpeed;
-        this.raceStarted = gameSpeed > 0;
-        this.boosted = false;
-        this.isMoving = false;
-        this.isJumping = false;
-        this.gameWidth = gameWidth;
-        this.gameHeight = gameHeight;
-        this.boundaryRight = this.gameWidth - this.width;
-        this.boundaryLeft = 0;
-        this.boundaryTop = this.gameHeight * 0.55 - this.height;
-        this.boundaryBottom = this.gameHeight - this.height;
-        this.oscillationAmplitude = 0.03; // Vertical oscillation amplitude
-        this.oscillationFrequency = 0.05; // Vertical oscillation frequency
-        this.oscillationPhase = 0; // Initial phase for oscillation
+        this.color = 'red';
+    }
+    if (dinoName === 'Comet') {
+        this.height = 110;
+        this.width = 124.4;
+        this.color = 'blue';
+    }
+    if (dinoName === 'Fuego') {
+        this.height = 100;
+        this.width = 112.2;
+        this.color = 'green';
+    }
+    if (dinoName === 'Nitro') {
+        this.height = 100;
+        this.width = 144;
+        this.color = 'yellow';
+    }
+    this.isBot = isBot;
+    this.x = 50;
+    this.y = gameHeight / 2 - this.height / 2;
+    this.dy = 0;
+    this.dx = 0;
+    this.acceleration = 1.5;  // How fast the player accelerates
+    this.friction = 0.1;      // How quickly the player decelerates when the key is released
+    this.maxSpeed = 4;        // Maximum speed the player can reach
+    this.baseSpeed = gameSpeed; 
+    this.speed = gameSpeed;
+    this.raceStarted = false;
+    this.boosted = false;
+    this.isMoving = false;
+    this.isJumping = false;
+    this.gameWidth = gameWidth;
+    this.gameHeight = gameHeight;
+    this.boundaryRight = this.gameWidth - this.width;
+    this.boundaryLeft = 0;
+    this.boundaryTop = this.gameHeight * 0.55 - this.height;
+    this.boundaryBottom = this.gameHeight - this.height;
+    this.oscillationAmplitude = 0.03; // Vertical oscillation amplitude
+    this.oscillationFrequency = 0.05; // Vertical oscillation frequency
+    this.oscillationPhase = 0; // Initial phase for oscillation
 
-        this.shadowBaseWidth = this.width * 0.8;  // Base size of the shadow
-        this.shadowBaseHeight = this.height * 0.2; // Base height of the shadow
+    this.shadowBaseWidth = this.width * 0.8;  // Base size of the shadow
+    this.shadowBaseHeight = this.height * 0.2; // Base height of the shadow
 
-        this.image = new Image();
-        this.image.src = `./assets/${dinoName}.png`;
+    // Array to store frames
+    this.frames = [];
+
+    // Load the frames
+    for (let i = 1; i <= 4; i++) {
+        const img = new Image();
+        img.src = `./assets/racers/${dinoName}/${dinoName}_${i}.png`;
+        this.frames.push(img);
+    }
+
+    // Frame control variables
+    this.currentFrame = 0;      // Start with the first frame
+    this.frameInterval = 100;   // Adjust the interval (in ms) for frame switching
+    this.lastFrameTime = Date.now(); // Track time to switch frames
+  }
+  // Update frame logic based on whether the race has started
+  
+  animateFrames() {
+    const now = Date.now();
+
+    if (!this.raceStarted) {
+      // Before the race starts, keep showing the first frame
+      this.currentFrame = 0;
+    } else {
+      // After the race starts, loop through frames 1, 2, and 3 (0-indexed as 1, 2, 3)
+      if (now - this.lastFrameTime > this.frameInterval) {
+          // Cycle through frames 1 to 3
+          this.currentFrame = (this.currentFrame + 1) % 3 + 1; // +1 to skip the first frame (index 0)
+          this.lastFrameTime = now;
+      }
+    }
   }
 
   botAI() {
@@ -85,7 +114,20 @@ export default class Racer {
     // Calculate the shadow's width and height based on the scale
     const shadowWidth = this.shadowBaseWidth * shadowScale;
     const shadowHeight = this.shadowBaseHeight * shadowScale;
-      
+    
+    // Create a radial gradient for dithering the shadow edges
+    const gradient = ctx.createRadialGradient(
+      this.x + this.width / 2,  // X position of shadow center
+      shadowY,                  // Y position of shadow
+      shadowWidth / 4,          // Inner radius (darker part)
+      this.x + this.width / 2,  // X position of shadow center
+      shadowY,                  // Y position of shadow
+      shadowWidth / 2           // Outer radius (lighter, more transparent part)
+    );
+
+    // Define gradient color stops to create the dithering effect
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');  // Darker center
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');    // Fully transparent edges
 
     // Draw the shadow directly underneath the player
     ctx.beginPath();
@@ -98,17 +140,23 @@ export default class Racer {
       0,
       2 * Math.PI
     );
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';  // Semi-transparent black shadow
+    ctx.fillStyle = gradient;  // Semi-transparent black shadow
     ctx.fill();
   }
 
   draw(ctx) {
+    // Update frames based on raceStarted status
+    this.animateFrames();
     // Draw the shadow first (beneath the player)
     this.drawShadow(ctx);
 
-    if (this.image.complete) {
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    // Draw the current frame
+    const frame = this.frames[this.currentFrame];
+
+    if (frame.complete) {
+        ctx.drawImage(frame, this.x, this.y, this.width, this.height);
     } else {
+        // Fallback in case image hasn't loaded yet
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }

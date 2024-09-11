@@ -1,7 +1,6 @@
 import { Tween, Easing, update as TWEENUpdate } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 import Racer from './racer.js';
 import Obstacle from './obstacle.js';
-// import Jump from './jump.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
 import Bot from './bot.js';
@@ -16,6 +15,7 @@ export default class Game {
         this.gameWidth = this.canvas.width;
         this.gameHeight = this.canvas.height;
         this.player = null;
+        this.racers = [];
         this.bots = [];
         this.gameSpeed = 2;
         this.difficulty_level = 2;
@@ -39,8 +39,11 @@ export default class Game {
     }
 
     startGame(dinoName) {
+        // Hide the character selection screen
         document.getElementById('character-selection').style.display = 'none';
-        this.player = new Racer(dinoName, this.gameHeight, this.gameSpeed, this.gameWidth); //Build the player object
+    
+        // Build the player object
+        this.player = new Racer(dinoName, this.gameHeight, this.gameSpeed, this.gameWidth); 
         this.gameSpeed = 0;
         this.obstacles = [];
         this.boosts = [];
@@ -48,23 +51,25 @@ export default class Game {
         this.isGameRunning = true;
         this.coinCount = 0;
         this.bots = this.createBots(dinoName);
-        this.gameLoop();
-        // Play the "321go.mp3" file for 6 seconds
+        
+        // Play the countdown sound "321go.mp3"
         const countdownAudio = new Audio('./assets/sounds/321go.mp3');
         countdownAudio.volume = 0.3;
-
         countdownAudio.play();
         
-        // Wait for 6 seconds before starting the game
+        // Update the game loop during the countdown
+        this.gameLoop();
+        
+        // Wait for 3 seconds for the countdown before starting the race
         setTimeout(() => {
-            // Start the game after 6 seconds
-            this.gameSpeed = 2;
-            this.bots.stalled = false;
-            this.spawnObjects();
-            this.increaseDifficulty();  // Start increasing game speed
-            // Start playing the theme music when the game starts
+            // Start the background music and race
             this.themeMusic.play();
-        }, 3000);
+            this.gameSpeed = 2;  // Start the race with the initial speed
+            this.player.raceStarted = true;  // Set raceStarted to true for the player
+            this.bots.forEach(bot => bot.raceStarted = true);
+            this.spawnObjects(); // Start spawning obstacles, boosts, and coins
+            this.increaseDifficulty();  // Start increasing game speed over time
+        }, 3000); // 3 seconds for countdown
     }
 
     stopGame() {
