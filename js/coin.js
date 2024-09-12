@@ -1,33 +1,19 @@
-export default class Coin {
-  constructor(gameWidth, gameHeight, gameSpeed) {
-      this.width = 30;
-      this.height = 45;
-      this.radius = 10;
-      this.x = gameWidth;
-      this.y = gameHeight / 2 + Math.random() * (gameHeight / 2 - this.height);
-      this.speed = gameSpeed;
-      // Load the coin sound
-      this.coinSound = new Audio('./assets/sounds/coin.mp3'); // Path to your coin sound
-      this.coinSound.volume = 0.5;  // Set volume (optional)
-      this.image = new Image();
-      this.image.src = './assets/DR_VG_pickleWeb(200x300).png';
+import Collidable from './collidable.js';
+
+export default class Coin extends Collidable {
+  constructor(x, y, speed, currentLane) {
+    super(x, y, 30, 30, speed, currentLane); // Adjust width and height as needed
+    this.image = new Image();
+    this.image.src = './assets/DR_VG_pickleWeb(200x300).png';
+    this.coinSound = new Audio('./assets/sounds/coin.mp3'); // Update with your actual sound path
+    this.coinSound.volume = 0.5;  // Set volume (optional)
+    
   }
 
   draw(ctx) {
-    if (this.image.complete) {
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    } else {
-        ctx.fillStyle = 'gold';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); // Draw a circle
-        ctx.fill();
-    }
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 
-  update() {
-      this.x -= this.speed;
-  }
-  // Play the coin sound
   playCoinSound() {
     this.coinSound.play();
   }
