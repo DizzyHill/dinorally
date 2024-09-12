@@ -109,7 +109,7 @@ export default class Game {
   }
 
   createBots(chosenDino, availableLanes) {
-    const numBots = Math.min(3, availableLanes.length);
+    const numBots = Math.min(1, availableLanes.length);
     const dinoNames = this.dinos.filter(name => name !== chosenDino);
     
     return Array.from({ length: numBots }, (_, index) => {
@@ -121,11 +121,11 @@ export default class Game {
   spawnObjects() {
     if (!this.isGameRunning) return;
 
-    const randomLane = this.track.lanes[Math.floor(Math.random() * this.track.lanes.length)];
+    const lanes = this.shuffleArray([...this.track.lanes]);
     
-    this.spawnObject(Obstacle, this.difficulty_level * 0.5, randomLane);
-    this.spawnObject(Boost, this.difficulty_level * 0.3, randomLane);
-    this.spawnObject(Coin, this.difficulty_level * 0.15, randomLane);
+    this.spawnObject(Obstacle, this.difficulty_level * 0.5, lanes[0]);
+    this.spawnObject(Boost, this.difficulty_level * 0.3, lanes[1]);
+    this.spawnObject(Coin, this.difficulty_level * 0.15, lanes[2]);
 
     setTimeout(() => this.spawnObjects(), 1000);
   }
