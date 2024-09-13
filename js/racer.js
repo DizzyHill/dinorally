@@ -2,10 +2,11 @@
 import { Tween, Easing } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 
 export default class Racer {
-  constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false) {
+  constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false, extraLives = 0) {
     this.isBot = isBot;
+    this.isPlayer = !this.isBot;
     this.track = track
-    this.currentLane = lane; // Use the provided lane
+    this.lane = lane; // Use the provided lane
     this.dinoName = dinoName;
     // Dino-specific configurations
     switch(dinoName) {
@@ -30,16 +31,14 @@ export default class Racer {
         this.color = 'yellow';
         break;
     }
-
-    // Calculate the vertical center of the lane
-    const laneCenter = (this.currentLane.topBoundary + this.currentLane.bottomBoundary) / 2;
     
     this.x = 50; // Starting x position
     // Position the bottom of the racer at the vertical center of the lane
-    this.y = laneCenter - this.height;
+    this.y = (this.lane.topBoundary + this.lane.bottomBoundary) / 2 - this.height;
     this.dy = 0;
     this.dx = 0;
     this.acceleration = 1.5;  // How fast the player accelerates
+    this.isAccelerating = false;
     this.friction = 0.1;      // How quickly the player decelerates when the key is released
     this.maxSpeed = 4;        // Maximum speed the player can reach
     this.baseSpeed = gameSpeed; 
@@ -48,12 +47,11 @@ export default class Racer {
     this.boosted = false;
     this.isMoving = false;
     this.isJumping = false;
+    this.notJumping = !this.isJumping;
     this.gameWidth = gameWidth;
     this.gameHeight = gameHeight;
-    this.boundaryRight = this.gameWidth - this.width;
-    this.boundaryLeft = 0;
-    this.boundaryTop = this.gameHeight * 0.55 - this.height;
-    this.boundaryBottom = this.gameHeight - this.height;
+    this.boundaryTop = this.track.topBoundary - this.height;
+    this.boundaryBottom = this.track.bottomBoundary - this.height;
     this.oscillationAmplitude = 0.03; // Vertical oscillation amplitude
     this.oscillationFrequency = 0.05; // Vertical oscillation frequency
     this.oscillationPhase = 0; // Initial phase for oscillation
@@ -76,11 +74,34 @@ export default class Racer {
     this.frameInterval = 100;   // Adjust the interval (in ms) for frame switching
     this.lastFrameTime = Date.now(); // Track time to switch frames
 
-    this.laneNumber = this.currentLane.laneNumber; // Set the initial lane number
+    this.laneNumber = this.lane.laneNumber; // Set the initial lane number
     this.originalSpeed = gameSpeed;
+    this.lives = extraLives;
+    this.projectiles = [];
+    this.maxProjectiles = 3;
   }
-  // Update frame logic based on whether the race has started
-  
+
+  shootProjectile() {
+    if (this.projectiles.length > 0) {
+      return this.projectiles.pop();
+    }
+    return null;
+  }
+
+  hit() {
+    if (this.isBot) {
+      this.stall();
+      return false;
+    } else {
+      if (this.lives > 0) {
+        this.lives--;
+        this.stall();
+        return false;
+      }
+      return true;
+    }
+  }
+
   animateFrames() {
     const now = Date.now();
 
@@ -97,26 +118,10 @@ export default class Racer {
     }
   }
 
-  botAI() {
-    // Add simple AI behavior for bots
-    // Example: Move forward with a small chance of jumping
-    if (this.stalled) {
-      this.dx = -this.speed;
-    } else {
-      this.x += this.speed;
-    }
-
-    // Random jump logic for bots
-    if (Math.random() < 0.01) {
-        this.jump();
-    }
-  }
-
-
   // Draw the shadow beneath the player
   drawShadow(ctx) {
     // Determine if the player is jumping
-    const shadowY = this.isJumping ? this.shadowFixedY : (this.y + this.height);
+    const shadowY = this.isJumping ? this.shadowFixedY : (this.y + this.height - 5);
     
     let shadowScale = 1;
     if (this.isJumping) {
@@ -166,15 +171,18 @@ export default class Racer {
     // Draw the shadow first (beneath the player)
     this.drawShadow(ctx);
 
-    // Draw the current frame
-    const frame = this.frames[this.currentFrame];
+    // Only draw the racer if it's visible
+    if (this.visible !== false) {
+      // Draw the current frame
+      const frame = this.frames[this.currentFrame];
 
-    if (frame.complete) {
+      if (frame.complete) {
         ctx.drawImage(frame, this.x, this.y, this.width, this.height);
-    } else {
+      } else {
         // Fallback in case image hasn't loaded yet
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
     }
 
     // Visualize the hitbox around the player
@@ -199,6 +207,12 @@ export default class Racer {
   update() {
     if (!this.raceStarted) {
       // If the race hasn't started, don't update position
+      return;
+    }
+
+    if (this.stalled) {
+      // If the racer is stalled, move backwards
+      this.x += this.dx;
       return;
     }
 
@@ -227,39 +241,174 @@ export default class Racer {
     this.x += this.dx;
     this.y += this.dy;
 
-    // Keep the player within the game bounds (example)
-    // Block Player from going to the top part of the screen 
+    // Keep the player within the game bounds
+    // Block Racer from going outside the top part of the track 
     if (!this.isJumping && this.y < this.boundaryTop) this.y = this.boundaryTop;
-    // Block Player from going past the bottom part of the screen
+    // Block Racer from going past the bottom part of the track
     if (this.y > this.boundaryBottom) this.y = this.boundaryBottom;
-    // Block Player from going past the left part of the screen
-    if (this.x < this.boundaryLeft) {
-        this.x = this.boundaryLeft;
+    
+  
+    // Block Player from going past the left part of the track
+    if (this.x < 0) {
+        this.x = 0;
     }
-    // Block Player from going past the right part of the screen
-    if (this.x > this.boundaryRight) {
-        this.x = this.boundaryRight;
+    // Block Player from going past the right part of the track
+    if (this.x > this.track.width / 2 - this.width) {
+        this.x = this.track.width / 2 - this.width;
+        this.dx = this.speed + this.acceleration;
+    }
+    console.log(this.speed);
+  }
+
+  botAI() {
+    if (this.stalled) {
+      // If the bot is stalled, don't perform any AI actions
+      return;
+    }
+
+    // Use the current speed (which will be boosted if a boost was hit)
+    this.dx = this.speed;
+    this.x += this.dx;
+
+    // if (this.x < 0 - this.width * 2) {
+    //   this.boost();
+    // }
+
+    // if (this.x > this.track.width + this.width) {
+    //   this.boost();
+    // }
+
+    // Random lane change logic
+    if (Math.random() < 0.005) { // Adjust this probability as needed
+      const direction = Math.random() < 0.5 ? 'up' : 'down';
+      this.changeLane(direction === 'up');
     }
   }
 
-  // Change the current lane based on the player's movement
-  // changeLane(up) {
-  //   const currentLaneIndex = this.track.lanes.indexOf(this.currentLane);
-  //   const newLaneIndex = up ? currentLaneIndex - 1 : currentLaneIndex + 1;
+  changeLane(up) {
+    const currentLaneIndex = this.track.lanes.indexOf(this.lane);
+    const newLaneIndex = up ? currentLaneIndex - 1 : currentLaneIndex + 1;
     
-  //   if (newLaneIndex >= 0 && newLaneIndex < this.track.lanes.length) {
-  //     // Update the current lane to the new lane
-  //     this.currentLane = this.track.lanes[newLaneIndex];
+    if (newLaneIndex >= 0 && newLaneIndex < this.track.lanes.length) {
+      this.lane = this.track.lanes[newLaneIndex];
+      this.laneNumber = this.lane.laneNumber;
       
-  //     // Adjust the racer's y position to match the new lane's y position
-  //     // this.y = this.currentLane.yPosition;
+      // Smoothly move to the new lane's center
+      const newY = (this.lane.topBoundary + this.lane.bottomBoundary) / 2 - this.height / 2;
+      new Tween(this)
+        .to({ y: newY }, 500) // 500ms duration, adjust as needed
+        .easing(Easing.Quadratic.InOut)
+        .start();
+    }
+  }
   
-  //     // Update the lane number (zIndex)
-  //     this.laneNumber = this.currentLane.laneNumber;
+  updateLanePosition() {
+    if (!this.isJumping) {
+      const racerBottom = this.y + this.height;
+      const currentLane = this.track.lanes.find(lane => lane.isInLane(racerBottom));
+      
+      if (currentLane && currentLane !== this.lane) {
+          this.lane = currentLane;
+          this.laneNumber = this.lane.laneNumber;
+          console.log("Racer has entered lane: " + this.laneNumber);
+      }
+    }
+  }
 
-  //     console.log("lane number: " + this.laneNumber);
-  //   }
-  // }
+  setSpeedChangeCallback(callback) {
+    this.onSpeedChange = callback;
+  }
+
+  boost(boostTime = 1000) {
+    if (this.boosted) return;
+
+    this.boosted = true;
+    const originalSpeed = this.speed;
+    this.speed *= 2;
+    
+    if (this.onSpeedChange) {
+      this.onSpeedChange(this.speed);
+    }
+    
+    setTimeout(() => {
+      this.speed = originalSpeed;
+      this.boosted = false;
+      if (this.onSpeedChange) {
+        this.onSpeedChange(this.speed);
+      }
+    }, boostTime);
+  }
+
+  // If you need to change speed in other methods, don't forget to call the callback
+  setSpeed(newSpeed) {
+    this.speed = newSpeed;
+    if (this.onSpeedChange) {
+      this.onSpeedChange(this.speed);
+    }
+  }
+
+  stall(delay = 1000) {
+    console.log(this.dinoName + " Stalled");
+    let originalDx = this.dx;
+    let originalDy = this.dy;
+    this.stalled = true;
+    // Stop the Racer    
+    this.dx = -this.speed;
+    this.dy = 0;
+
+    this.visible = true; // Ensure visibility at the start
+    let blinkCount = 0;
+    const blinkInterval = setInterval(() => {
+      this.visible = !this.visible;
+      blinkCount++;
+      if (blinkCount >= 6) { // 3 full blinks (on-off-on-off-on-off)
+        clearInterval(blinkInterval);
+        this.visible = true;
+      }
+    }, 100); // Faster blink interval for more noticeable effect
+
+    setTimeout(() => {
+      console.log(this.dinoName + " Unstalled");
+      this.stalled = false;
+      this.dx = originalDx; // Restore original speed
+      this.dy = originalDy; // Restore original speed
+      this.visible = true; // Ensure visibility after stall
+    }, delay);
+  }
+
+  jump() {
+    if (!this.raceStarted || this.isJumping) return;
+    if (!this.isJumping) {  // Ensure jump happens only once per press
+        this.isJumping = true;  // Set jumping flag
+        this.jumpStartLane = this.lane; // Store the starting lane
+        
+        // Lock the shadow's y-position when the jump starts
+        this.shadowFixedY = this.y + this.height;
+        
+        let originalY = this.y;
+        let jumpHeight = 120;  // Adjust based on desired jump height
+        let jumpDuration = 800;  // Time to complete the jump animation
+
+        // Animate the jump up
+        const upTween = new Tween(this)
+            .to({ y: originalY - jumpHeight }, jumpDuration / 2)
+            .easing(Easing.Quadratic.Out);
+        
+        // Animate the fall down
+        const downTween = new Tween(this)
+            .to({ y: originalY }, jumpDuration / 2)
+            .easing(Easing.Quadratic.In)
+            .onComplete(() => {
+                this.isJumping = false;  // Reset jumping flag after landing
+                this.lane = this.jumpStartLane; // Reset to the starting lane
+                this.laneNumber = this.lane.laneNumber;
+            });
+
+        // Chain the tweens: jump up, then fall down
+        upTween.chain(downTween);
+        upTween.start();
+    }
+  }
 
   moveUp() {
     if (!this.raceStarted) return;
@@ -285,130 +434,7 @@ export default class Racer {
   moveRight() {
     if (!this.raceStarted) return;
     if (this.dx < this.maxSpeed) {
-        this.dx += this.acceleration;  // Accelerate right
-    }
-  }
-  // In your update loop or game loop, check if the racer crosses lane boundaries
-  // updateLanePosition() {
-  //   this.laneNumber = this.currentLane.laneNumber;
-  //   console.log("draw lane: " + this.laneNumber, this.currentLane.topBoundry, this.currentLane.bottomBoundry);
-
-  //   // Check if the racer has moved into a new lane
-  //   for (let i = 0; i < this.track.lanes.length; i++) {
-  //     const lane = this.track.lanes[i];
-
-  //     // If racer's y is within the current lane's top and bottom boundaries
-  //     if (this.y >= lane.topBoundary && this.y <= lane.bottomBoundary) {
-  //       if (this.currentLane !== lane) {
-  //         // Update the current lane and lane number
-  //         this.currentLane = lane;
-  //         this.laneNumber = lane.laneNumber;
-
-  //         console.log("Racer has entered lane: " + this.laneNumber);
-  //       }
-  //       break;
-  //     }
-  //   }
-  // }
-  updateLanePosition() {
-    if (!this.isJumping) {
-      const racerBottom = this.y + this.height;
-      const currentLane = this.track.lanes.find(lane => lane.isInLane(racerBottom));
-      
-      if (currentLane && currentLane !== this.currentLane) {
-          this.currentLane = currentLane;
-          this.laneNumber = this.currentLane.laneNumber;
-          console.log("Racer has entered lane: " + this.laneNumber);
-      }
-    }
-  }
-
-  setSpeedChangeCallback(callback) {
-    this.onSpeedChange = callback;
-  }
-
-  applyBoost(boost) {
-    if (this.boosted) return;
-
-    this.boosted = true;
-    const originalSpeed = this.speed;
-    this.speed *= 4;
-    
-    if (this.onSpeedChange) {
-      this.onSpeedChange(this.speed);
-    }
-    
-    setTimeout(() => {
-      this.speed = originalSpeed;
-      this.boosted = false;
-      if (this.onSpeedChange) {
-        this.onSpeedChange(this.speed);
-      }
-    }, 1000);
-  }
-
-  // If you need to change speed in other methods, don't forget to call the callback
-  setSpeed(newSpeed) {
-    this.speed = newSpeed;
-    if (this.onSpeedChange) {
-      this.onSpeedChange(this.speed);
-    }
-  }
-
-  stall(delay = 1000) {
-    console.log(this.dinoName + " Stalled");
-    this.stalled = true;
-    const originalDx = this.dx;
-    this.dx = 0;
-
-    let blinkCount = 0;
-    const blinkInterval = setInterval(() => {
-      this.visible = !this.visible;
-      blinkCount++;
-      if (blinkCount >= 6) { // 3 full blinks (on-off-on-off-on-off)
-        clearInterval(blinkInterval);
-        this.visible = true;
-      }
-    }, 100); // Faster blink interval for more noticeable effect
-
-    setTimeout(() => {
-      console.log(this.dinoName + " Unstalled");
-      this.stalled = false;
-      this.dx = originalDx; // Restore original speed
-    }, delay);
-  }
-
-  jump() {
-    if (!this.raceStarted || this.isJumping) return;
-    if (!this.isJumping) {  // Ensure jump happens only once per press
-        this.isJumping = true;  // Set jumping flag
-        this.jumpStartLane = this.currentLane; // Store the starting lane
-        
-        // Lock the shadow's y-position when the jump starts
-        this.shadowFixedY = this.y + this.height;
-        
-        let originalY = this.y;
-        let jumpHeight = 120;  // Adjust based on desired jump height
-        let jumpDuration = 800;  // Time to complete the jump animation
-
-        // Animate the jump up
-        const upTween = new Tween(this)
-            .to({ y: originalY - jumpHeight }, jumpDuration / 2)
-            .easing(Easing.Quadratic.Out);
-        
-        // Animate the fall down
-        const downTween = new Tween(this)
-            .to({ y: originalY }, jumpDuration / 2)
-            .easing(Easing.Quadratic.In)
-            .onComplete(() => {
-                this.isJumping = false;  // Reset jumping flag after landing
-                this.currentLane = this.jumpStartLane; // Reset to the starting lane
-                this.laneNumber = this.currentLane.laneNumber;
-            });
-
-        // Chain the tweens: jump up, then fall down
-        upTween.chain(downTween);
-        upTween.start();
+      this.dx += this.acceleration;  // Accelerate right
     }
   }
 

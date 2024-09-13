@@ -4,6 +4,7 @@ import Obstacle from './obstacle.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
 import Track from './track.js';
+import Collectable from './collectable.js';
 
 export default class Game {
   constructor(canvasId) {
@@ -13,6 +14,8 @@ export default class Game {
     this.canvas.height = window.innerHeight;
     this.gameWidth = this.canvas.width;
     this.gameHeight = this.canvas.height;
+
+    this.collectableTypes = ['coin', 'powerup', 'shield']; // Add more types as needed
 
     this.initializeGameState();
     this.initializeAudio();
@@ -27,7 +30,10 @@ export default class Game {
     this.difficulty_level = 2;
     this.collidables = [];
     this.isGameRunning = false;
+
     this.coinCount = 0;
+    this.collectableCount = 0;
+
     this.dinos = ["Nitro", "Comet", "Fuego", "Bash"];
     this.backgroundImage = new Image();
     this.backgroundImage.src = './assets/VG_BackGround_2.png';
@@ -38,6 +44,11 @@ export default class Game {
   initializeAudio() {
     this.themeMusic = this.createAudio('./assets/sounds/theme.mp3', true, 0.5);
     this.gameOverSound = this.createAudio('./assets/sounds/game_over.mp3', false, 0.7);
+    // Add event listener for theme music loop
+    this.themeMusic.addEventListener('ended', () => {
+      this.themeMusic.playbackRate += 0.1; // Increase speed by 10% each loop
+      this.themeMusic.play();
+    });
   }
 
   createAudio(src, loop, volume) {
@@ -61,7 +72,7 @@ export default class Game {
     document.getElementById('character-selection').style.display = 'none';
     
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
-    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth);
+    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1);
     this.player.setSpeedChangeCallback(this.handlePlayerSpeedChange.bind(this));
     this.bots = this.createBots(dinoName, shuffledLanes.slice(1));
     this.racers = [this.player, ...this.bots];
@@ -109,7 +120,7 @@ export default class Game {
   }
 
   createBots(chosenDino, availableLanes) {
-    const numBots = Math.min(1, availableLanes.length);
+    const numBots = Math.min(2, availableLanes.length);
     const dinoNames = this.dinos.filter(name => name !== chosenDino);
     
     return Array.from({ length: numBots }, (_, index) => {
@@ -123,10 +134,10 @@ export default class Game {
 
     const lanes = this.shuffleArray([...this.track.lanes]);
     
-    this.spawnObject(Obstacle, this.difficulty_level * 0.5, lanes[0]);
-    this.spawnObject(Boost, this.difficulty_level * 0.3, lanes[1]);
-    this.spawnObject(Coin, this.difficulty_level * 0.15, lanes[2]);
-
+    this.spawnObject(Obstacle, this.difficulty_level * 0.3, lanes[0]);
+    this.spawnObject(Boost, this.difficulty_level * 0.1, lanes[1]);
+    this.spawnObject(Coin, this.difficulty_level * 0.1, lanes[2]);
+    this.spawnObject(Collectable, this.difficulty_level * 0.1, lanes[3]);
     setTimeout(() => this.spawnObjects(), 1000);
   }
 
@@ -174,37 +185,8 @@ export default class Game {
     });
   }
 
-  handleCollision(racer, obj) {
-    if (obj instanceof Boost) {
-      racer.applyBoost(obj);
-      if (racer === this.player) {
-        obj.boostSound.play();
-      }
-      this.updateSpeeds();
-    } else if (obj instanceof Coin) {
-      this.collectCoin(obj, racer);
-    } else if (obj instanceof Obstacle) {
-      if (racer === this.player) {
-        this.isGameRunning = false;
-      } else {
-        // Handle bot collision with obstacle (e.g., slow down)
-        racer.stall();
-      }
-    }
-  }
-
-  collectCoin(coin, racer) {
-    if (racer === this.player) {
-      this.coinCount++;
-      coin.playCoinSound();
-    } else {
-      // Optionally track bot coin collection
-      racer.coinCount = (racer.coinCount || 0) + 1;
-    }
-  }
-
   detectCollision(racer, item) {
-    if (racer.currentLane !== item.currentLane) return false;
+    if (racer.lane !== item.lane) return false;
 
     const padding = item instanceof Obstacle ? { x: racer.width * 0.25, y: racer.height * 0.25 } : { x: 0, y: 0 };
     return this.detectRectangularCollision(racer, item, padding.x, padding.y);
@@ -218,6 +200,72 @@ export default class Game {
       obj1.y + obj1.height - paddingY > obj2.y
     );
   }
+
+  handleCollision(racer, obj) {
+    if (obj instanceof Boost) {
+      racer.boost();
+      if (racer === this.player) {
+        obj.boostSound.play();
+      }
+      this.updateSpeeds();
+    } else if (obj instanceof Coin) {
+      this.collectCoin(obj, racer);
+    } else if (obj instanceof Obstacle) {
+      if (racer === this.player) {
+        if (this.player.hit()) {
+          this.isGameRunning = false;
+        }
+      } else {
+        // Handle bot collision with obstacle (e.g., slow down)
+        racer.stall();
+      }
+    } else if (obj instanceof Collectable) {
+      this.collectCollectable(obj, racer);
+    }
+  }
+
+  shootProjectile() {
+    const projectile = this.player.shootProjectile();
+    if (projectile) {
+      projectile.x = this.player.x + this.player.width;
+      projectile.y = this.player.y + this.player.height / 2;
+      this.projectiles.push(projectile);
+    }
+  }
+
+  collectCollectable(collectable, racer) {
+    if (racer === this.player) {
+      this.collectableCount++;
+      collectable.playCollectSound();
+      // You can add specific effects based on collectable type here
+      // switch (collectable.type) {
+      //   case 'coin':
+      //     this.coinCount++;
+      //     break;
+      //   case 'powerup':
+      //     // Add powerup effect
+      //     break;
+      //   case 'shield':
+      //     // Add shield effect
+      //     break;
+      // }
+    } else {
+      // Optionally track bot collectable collection
+      racer.collectableCount = (racer.collectableCount || 0) + 1;
+    }
+  }
+
+  collectCoin(coin, racer) {
+    if (racer === this.player) {
+      this.coinCount++;
+      coin.playCoinSound();
+    } else {
+      // Optionally track bot coin collection
+      racer.coinCount = (racer.coinCount || 0) + 1;
+    }
+  }
+
+  
 
   drawBackground() {
     if (this.gameSpeed > 0) {
@@ -234,6 +282,10 @@ export default class Game {
 
   drawCoinTally() {
     this.drawInfoBox(`Pickles: ${this.coinCount}`, this.gameWidth - 170, 10, 150, 40);
+  }
+
+  drawCollectableTally() {
+    this.drawInfoBox(`Acorns: ${this.collectableCount}`, this.gameWidth / 2 - 75, 10, 150, 40);
   }
 
   drawDifficulty() {
@@ -280,7 +332,7 @@ export default class Game {
 
     this.drawCoinTally();
     this.drawDifficulty();
-    
+    this.drawCollectableTally();
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
   }

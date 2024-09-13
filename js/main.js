@@ -18,9 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add keyboard controls for player movement
   window.addEventListener('keydown', (e) => {
     if (!game.player) return;
-    
-    game.player.isMoving = true;
-    
+        
     game.player.isMoving = true;
     
     switch (e.key) {
@@ -38,10 +36,20 @@ document.addEventListener('DOMContentLoaded', () => {
       break;
       case 'ArrowRight':
       case 'd':
+        game.player.isAccelerating = true;
         game.player.moveRight();
       break;
       case ' ':
         game.player.jump();  // Call jump method for smooth jump
+      break;
+      case 'f':
+      case 'F':
+        const projectile = game.player.shootProjectile();
+        if (projectile) {
+          projectile.x = game.player.x + game.player.width;
+          projectile.y = game.player.y + game.player.height / 2;
+          game.projectiles.push(projectile);
+        }
       break;
     }
   });
@@ -53,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'ArrowUp':
         case 'w':
         game.player.dy = 0;
+        game.player.isAccelerating = false;
         break;
         case 'ArrowDown':
         case 's':

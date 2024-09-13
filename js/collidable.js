@@ -1,11 +1,11 @@
 export default class Collidable {
-  constructor(x, y, width, height, speed, currentLane) {
+  constructor(x, y, width, height, speed, lane) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.speed = speed;
-    this.currentLane = currentLane;
+    this.lane = lane;
   }
 
   update() {
