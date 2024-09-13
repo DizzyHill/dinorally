@@ -4,15 +4,14 @@ export default class Projectile extends Collidable {
   constructor(x, y, speed, lane) {
     super(x, y, 30, 30, speed, lane); // Adjust width and height as needed
     this.image = new Image();
-    this.image.src = './assets/projectiles/fireball_1.png';
-    
+
     // Array to store frames
     this.frames = [];
 
     // Load the frames
     for (let i = 1; i <= 4; i++) {
         const img = new Image();
-        img.src = `./assets/racers/${dinoName}/${dinoName}_${i}.png`;
+        img.src = `./assets/projectiles/fireball_${i}.png`;
         this.frames.push(img);
     }
 
@@ -42,8 +41,21 @@ export default class Projectile extends Collidable {
   }
 
   draw(ctx) {
-    ctx.fillStyle = 'orange'; // Adjust color as needed
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    // Update frames based on raceStarted status
+    this.animateFrames();
+    // Draw the shadow first (beneath the player)
+    this.drawShadow(ctx);
+
+    // Draw the current frame
+    const frame = this.frames[this.currentFrame];
+
+    if (frame.complete) {
+      ctx.drawImage(frame, this.x, this.y, this.width, this.height);
+    } else {
+      // Fallback in case image hasn't loaded yet
+      ctx.fillStyle = "orange";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
   }
 
   isOffScreen() {

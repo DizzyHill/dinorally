@@ -216,30 +216,50 @@ export default class Racer {
       return;
     }
 
-    if (this.isBot) {
-      this.botAI(); // Bots will have automated movement logic
-    } else {
-      this.updateLanePosition(); // Players will have manual movement
-    }
-
-    if (!this.isMoving) {
-        // Apply friction (deceleration) when not moving
-        if (this.dx > 0) {
-            this.dx = Math.max(0, this.dx - this.friction);
-        } else if (this.dx < 0) {
-            this.dx = Math.min(0, this.dx + this.friction);
-        }
-
-        if (this.dy > 0) {
-            this.dy = Math.max(0, this.dy - this.friction);
-        } else if (this.dy < 0) {
-            this.dy = Math.min(0, this.dy + this.friction);
-        }
-    }
-
-    // Update player position
-    this.x += this.dx;
+    // Update Racer vertical position
     this.y += this.dy;
+
+    const viewWidthLeft = this.gameWidth / 2 - this.width;
+    const viewWidthRight = this.gameWidth / 2 + this.width;
+    
+    if (this.isBot) {
+      // Use the current speed (which will be boosted if a boost was hit)
+      this.dx = this.speed;
+      this.x += this.dx;
+
+      // Gradually move the player back into view
+      if (this.x < this.track.width / 2 - this.width * 2) {
+        const overflowDistance = viewWidthLeft - this.x;
+        const moveForwardSpeed = Math.min(overflowDistance, this.speed);
+        this.x += moveForwardSpeed;
+      }
+      
+      if (this.x > this.track.width / 2 + this.width * 2) {
+        const overflowDistance = this.x - viewWidthRight;
+        const moveBackSpeed = Math.min(overflowDistance, this.speed);
+        this.x -= moveBackSpeed;
+      }
+  
+      // Random lane change logic
+      if (Math.random() < 0.005) { // Adjust this probability as needed
+        const direction = Math.random() < 0.5 ? 'up' : 'down';
+        this.changeLane(direction === 'up');
+      }
+
+    } else {
+
+      if (!this.isJumping) {
+        const racerBottom = this.y + this.height;
+        const currentLane = this.track.lanes.find(lane => lane.isInLane(racerBottom));
+      
+        if (currentLane && currentLane !== this.lane) {
+          this.lane = currentLane;
+          this.laneNumber = this.lane.laneNumber;
+          // console.log("Racer has entered lane: " + this.laneNumber);
+        }
+      }
+
+    }
 
     // Keep the player within the game bounds
     // Block Racer from going outside the top part of the track 
@@ -247,17 +267,30 @@ export default class Racer {
     // Block Racer from going past the bottom part of the track
     if (this.y > this.boundaryBottom) this.y = this.boundaryBottom;
     
-  
-    // Block Player from going past the left part of the track
-    if (this.x < 0) {
-        this.x = 0;
-    }
-    // Block Player from going past the right part of the track
-    if (this.x > this.track.width / 2 - this.width) {
+    if (this.isPlayer) {
+      // Block Player from going past the left part of the track
+      if (this.x < 0) {
+          this.x = 0;
+      }
+      
+      // Gradually move the player back into view
+      if (this.x < viewWidthLeft) {
+        const overflowDistance = viewWidthLeft - this.x;
+        const moveForwardSpeed = Math.min(overflowDistance, this.speed);
+        this.x += moveForwardSpeed;
+      }
+      
+      if (this.x > viewWidthRight) {
+        const overflowDistance = this.x - viewWidthRight;
+        const moveBackSpeed = Math.min(overflowDistance, this.speed);
+        this.x -= moveBackSpeed;
+      }
+
+      if (this.x > this.track.width / 2 - this.width) {
         this.x = this.track.width / 2 - this.width;
         this.dx = this.speed + this.acceleration;
+      }
     }
-    console.log(this.speed);
   }
 
   botAI() {
@@ -310,13 +343,31 @@ export default class Racer {
       if (currentLane && currentLane !== this.lane) {
           this.lane = currentLane;
           this.laneNumber = this.lane.laneNumber;
-          console.log("Racer has entered lane: " + this.laneNumber);
+          // console.log("Racer has entered lane: " + this.laneNumber);
       }
     }
   }
 
   setSpeedChangeCallback(callback) {
     this.onSpeedChange = callback;
+  }
+
+  accelerate(isAccelerating, ogSpeed) {
+    // console.log("Accelerating: " + isAccelerating);
+    this.isAccelerating = isAccelerating;
+    const accelerationFactor = 1.5; // 5% increase
+    
+    if (this.isAccelerating) {
+      this.speed = ogSpeed * accelerationFactor;
+      // console.log("Speed: " + this.speed);
+    } else {
+      this.speed = ogSpeed;
+      // console.log("Speed: " + this.speed);
+    }
+
+    if (this.onSpeedChange) {
+      this.onSpeedChange(this.speed);
+    }
   }
 
   boost(boostTime = 1000) {
@@ -326,7 +377,7 @@ export default class Racer {
     const originalSpeed = this.speed;
     this.speed *= 2;
     
-    if (this.onSpeedChange) {
+    if (this.isPlayer && this.onSpeedChange) {
       this.onSpeedChange(this.speed);
     }
     
@@ -424,19 +475,19 @@ export default class Racer {
     }
   }
 
-  moveLeft() {
-    if (!this.raceStarted) return;
-    if (this.dx > -this.maxSpeed) {
-        this.dx -= this.acceleration;  // Accelerate left
-    }
-  }
+  // moveLeft() {
+  //   if (!this.raceStarted) return;
+  //   if (this.dx > -this.maxSpeed) {
+  //       this.dx -= this.acceleration;  // Accelerate left
+  //   }
+  // }
 
-  moveRight() {
-    if (!this.raceStarted) return;
-    if (this.dx < this.maxSpeed) {
-      this.dx += this.acceleration;  // Accelerate right
-    }
-  }
+  // moveRight() {
+  //   if (!this.raceStarted) return;
+  //   if (this.dx < this.maxSpeed) {
+  //     this.dx += this.acceleration;  // Accelerate right
+  //   }
+  // }
 
   startRace() {
     this.raceStarted = true;

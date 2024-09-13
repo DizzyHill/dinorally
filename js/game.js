@@ -26,8 +26,8 @@ export default class Game {
     this.player = null;
     this.racers = [];
     this.bots = [];
-    this.gameSpeed = 2;
-    this.difficulty_level = 2;
+    this.gameSpeed = 5;
+    this.difficulty_level = 5;
     this.collidables = [];
     this.isGameRunning = false;
 
@@ -70,11 +70,14 @@ export default class Game {
 
   startGame(dinoName) {
     document.getElementById('character-selection').style.display = 'none';
-    
+    // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
+    // Create Player
     this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1);
     this.player.setSpeedChangeCallback(this.handlePlayerSpeedChange.bind(this));
+    // Create Bots
     this.bots = this.createBots(dinoName, shuffledLanes.slice(1));
+    // Combine Racers
     this.racers = [this.player, ...this.bots];
     
     this.resetGameState();
@@ -103,8 +106,8 @@ export default class Game {
 
   startRace() {
     this.themeMusic.play();
-    this.gameSpeed = 2;
     this.racers.forEach(racer => racer.raceStarted = true);
+    this.gameSpeed = 5;
     this.spawnObjects();
     this.increaseDifficulty();
   }
@@ -134,16 +137,28 @@ export default class Game {
 
     const lanes = this.shuffleArray([...this.track.lanes]);
     
-    this.spawnObject(Obstacle, this.difficulty_level * 0.3, lanes[0]);
-    this.spawnObject(Boost, this.difficulty_level * 0.1, lanes[1]);
+    // Increase obstacle spawn rate based on difficulty level
+    const obstacleProbability = Math.min(0.9, 0.1 + this.difficulty_level * 0.01);
+    
+    // Spawn obstacles in all lanes
+    lanes.forEach(lane => {
+      this.spawnObject(Obstacle, obstacleProbability, lane);
+    });
+
+    // Keep other object spawn rates similar
+    this.spawnObject(Boost, this.difficulty_level * 0.03, lanes[1]);
     this.spawnObject(Coin, this.difficulty_level * 0.1, lanes[2]);
-    this.spawnObject(Collectable, this.difficulty_level * 0.1, lanes[3]);
-    setTimeout(() => this.spawnObjects(), 1000);
+    this.spawnObject(Collectable, this.difficulty_level * 0.01, lanes[3]);
+
+    // Decrease spawn interval as difficulty increases
+    const spawnInterval = Math.max(200, 1000 - this.difficulty_level * 50);
+    setTimeout(() => this.spawnObjects(), spawnInterval);
   }
 
   spawnObject(ObjectClass, probability, lane) {
     if (Math.random() < probability) {
-      const object = new ObjectClass(this.gameWidth, lane.yPosition, this.gameSpeed, lane);
+      const randomXOffset = Math.random() * (this.gameWidth / 2); // Random offset within half the game width
+      const object = new ObjectClass(this.gameWidth + randomXOffset, lane.yPosition, this.gameSpeed, lane);
       this.collidables.push(object);
     }
   }
@@ -156,7 +171,7 @@ export default class Game {
         this.racers.forEach(racer => racer.setSpeed(this.gameSpeed));
         this.updateSpeeds();
       }
-    }, 5000);
+    }, 3500);
   }
 
   updateSpeeds() {
@@ -217,7 +232,7 @@ export default class Game {
         }
       } else {
         // Handle bot collision with obstacle (e.g., slow down)
-        racer.stall();
+        racer.stall(3000);
       }
     } else if (obj instanceof Collectable) {
       this.collectCollectable(obj, racer);
@@ -335,6 +350,7 @@ export default class Game {
     this.drawCollectableTally();
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
+    console.log(this.gameSpeed)
   }
 
   shuffleArray(array) {

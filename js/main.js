@@ -32,12 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
       break;
       case 'ArrowLeft':
       case 'a':
-        game.player.moveLeft();
+        // game.player.moveLeft();
       break;
       case 'ArrowRight':
       case 'd':
-        game.player.isAccelerating = true;
-        game.player.moveRight();
+        game.player.accelerate(true, game.difficulty_level);
+        // game.player.moveRight();
       break;
       case ' ':
         game.player.jump();  // Call jump method for smooth jump
@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'ArrowUp':
         case 'w':
         game.player.dy = 0;
-        game.player.isAccelerating = false;
         break;
         case 'ArrowDown':
         case 's':
@@ -69,11 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
         case 'ArrowLeft':
         case 'a':
-        game.player.dx = 0;
+        // game.player.dx = 0;
         break;
         case 'ArrowRight':
         case 'd':
-        game.player.dx = 0;
+        // game.player.dx = 0;
+        game.player.accelerate(false, game.difficulty_level);
         break;
       }
       game.player.isMoving = game.player.dy !== 0 || game.player.dx !== 0;
