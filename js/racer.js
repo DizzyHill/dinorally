@@ -77,6 +77,7 @@ export default class Racer {
     this.laneNumber = this.lane.laneNumber; // Set the initial lane number
     this.originalSpeed = gameSpeed;
     this.lives = extraLives;
+    this.collectableCount = 3;
   }
 
   hit() {
@@ -483,5 +484,11 @@ export default class Racer {
 
   startRace() {
     this.raceStarted = true;
+  }
+
+  collectCollectable() {
+    if (this.collectableCount < 3) {
+      this.collectableCount++;
+    }
   }
 }

@@ -5,6 +5,7 @@ import Boost from './boost.js';
 import Coin from './coin.js';
 import Track from './track.js';
 import Collectable from './collectable.js';
+import Projectile from './projectile.js';
 
 export default class Game {
   constructor(canvasId) {
@@ -39,6 +40,7 @@ export default class Game {
     this.backgroundImage.src = './assets/VG_BackGround_2.png';
     this.bgX = 0;
     this.backgroundSpeed = 3;
+    this.projectiles = [];
   }
 
   initializeAudio() {
@@ -198,6 +200,35 @@ export default class Game {
       
       return obj.x + obj.width >= 0;
     });
+
+    // Update and draw projectiles
+    this.projectiles = this.projectiles.filter(projectile => {
+      projectile.update();
+      projectile.draw(this.ctx);
+
+      // Check collisions with racers and obstacles
+      for (const racer of this.racers) {
+        if (racer !== this.player && this.detectCollision(projectile, racer)) {
+          racer.stall(3000);
+          return false; // Remove the projectile
+        }
+      }
+
+      for (const obstacle of this.collidables.filter(obj => obj instanceof Obstacle)) {
+        if (this.detectCollision(projectile, obstacle)) {
+          this.explodeObstacle(obstacle);
+          return false; // Remove the projectile
+        }
+      }
+
+      return !projectile.isOffScreen(this.gameWidth);
+    });
+  }
+
+  explodeObstacle(obstacle) {
+    // Remove the obstacle from collidables
+    this.collidables = this.collidables.filter(obj => obj !== obstacle);
+    // You can add explosion effects or sounds here
   }
 
   detectCollision(racer, item) {
@@ -242,19 +273,8 @@ export default class Game {
   collectCollectable(collectable, racer) {
     if (racer === this.player) {
       this.collectableCount++;
+      racer.collectCollectable();
       collectable.playCollectSound();
-      // You can add specific effects based on collectable type here
-      // switch (collectable.type) {
-      //   case 'coin':
-      //     this.coinCount++;
-      //     break;
-      //   case 'powerup':
-      //     // Add powerup effect
-      //     break;
-      //   case 'shield':
-      //     // Add shield effect
-      //     break;
-      // }
     } else {
       // Optionally track bot collectable collection
       racer.collectableCount = (racer.collectableCount || 0) + 1;
@@ -271,7 +291,18 @@ export default class Game {
     }
   }
 
-  
+  fireProjectile(racer) {
+    if (racer.collectableCount > 0) {
+      const projectile = new Projectile(
+        racer.x + racer.width,
+        racer.y + racer.height / 2,
+        this.gameSpeed * 1.5,
+        racer.lane
+      );
+      this.projectiles.push(projectile);
+      racer.collectableCount--;
+    }
+  }
 
   drawBackground() {
     if (this.gameSpeed > 0) {
@@ -290,12 +321,12 @@ export default class Game {
     this.drawInfoBox(`Pickles: ${this.coinCount}`, this.gameWidth - 170, 10, 150, 40);
   }
 
-  drawCollectableTally() {
-    this.drawInfoBox(`Acorns: ${this.collectableCount}`, this.gameWidth / 2 - 75, 10, 150, 40);
-  }
+  // drawCollectableTally() {
+  //   this.drawInfoBox(`Acorns: ${this.player.collectableCount}`, this.gameWidth / 2 - 75, 10, 150, 40);
+  // }
 
-  drawDifficulty() {
-    this.drawInfoBox(`Difficulty: ${this.difficulty_level}`, 20, 10, 180, 40);
+  drawFireBallTally() {
+    this.drawInfoBox(`Fire Balls: ${this.player.collectableCount}`, 20, 10, 180, 40);
   }
 
   drawInfoBox(text, x, y, width, height) {
@@ -337,8 +368,8 @@ export default class Game {
     });
 
     this.drawCoinTally();
-    this.drawDifficulty();
-    this.drawCollectableTally();
+    this.drawFireBallTally();
+    // this.drawCollectableTally();
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
     console.log(this.gameSpeed)
