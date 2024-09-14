@@ -15,6 +15,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
+  // Mobile control buttons
+  const upButton = document.getElementById('up-button');
+  const downButton = document.getElementById('down-button');
+  const jumpButton = document.getElementById('jump-button');
+  const fireButton = document.getElementById('fire-button');
+
+  // Touch controls
+  if ('ontouchstart' in window) {
+    // Up button
+    upButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (game.player) {
+        game.player.isMoving = true;
+        game.player.moveUp();
+      }
+    });
+
+    upButton.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (game.player) {
+        game.player.dy = 0;
+        game.player.isMoving = false;
+      }
+    });
+
+    // Down button
+    downButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (game.player) {
+        game.player.isMoving = true;
+        game.player.moveDown();
+      }
+    });
+
+    downButton.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (game.player) {
+        game.player.dy = 0;
+        game.player.isMoving = false;
+      }
+    });
+
+    // Jump button
+    jumpButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (game.player) {
+        game.player.jump();
+      }
+    });
+
+    // Fire button
+    fireButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (game.player) {
+        game.fireProjectile(game.player);
+      }
+    });
+  }
+
   // Add keyboard controls for player movement
   window.addEventListener('keydown', (e) => {
     if (!game.player) return;
