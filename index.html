@@ -16,7 +16,7 @@
     </script>
     <script type="module" src="./js/main.js"></script>
 </head>
-<body>
+<body class="bg-blue-500">
     <div id="main" class="flex flex-col">
         <div id="character-selection" class="flex flex-col">
             <h1 class="text-2xl font-bold mb-4">Choose Your Racer</h1>
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <canvas id="gameCanvas"></canvas>
 
         <div id="start_over" class="bg-white text-center p-4 flex flex-col items-center">
             <h1 class="text-2xl font-bold mb-4">Game Over</h1>
@@ -57,12 +57,16 @@
         </div>
         <div id="mobile-controls">
             <div class="left-controls">
-                <button id="up-button">↑</button>
-                <button id="down-button">↓</button>
+                <button id="up-button" class="flex flex-col items-center justify-center">↑</button>
+                <button id="down-button" class="flex flex-col items-center justify-center">↓</button>
             </div>
             <div class="right-controls">
-                <button id="jump-button">Jump</button>
-                <button id="fire-button">Fire</button>
+                <button id="jump-button" class="flex flex-col items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 text-green-500 bg-white rounded-full">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm.53 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v5.69a.75.75 0 0 0 1.5 0v-5.69l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
+                    </svg>                      
+                </button>
+                <button id="fire-button" class="flex flex-col items-center justify-center" style="background-image: url('./assets/projectiles/fireball_1.png'); background-size: cover; background-position: -14px center;"></button>
             </div>
         </div>
     </div>    
