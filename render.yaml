@@ -1,0 +1,10 @@
+   services:
+     - type: web
+       name: Dino Rally Rush
+       env: static
+       buildCommand: echo "No build command needed for static files"
+       staticPublishPath: .
+       routes:
+         - type: rewrite
+           source: /*
+           destination: /index.html
