@@ -141,38 +141,4 @@ document.addEventListener('DOMContentLoaded', () => {
       game.player.isMoving = game.player.dy !== 0 || game.player.dx !== 0;
     }
   });
-
-  // Add this function to your main.js file
-  function handleOrientation() {
-    if (window.innerHeight > window.innerWidth) {
-      alert("Please rotate your device to landscape mode for the best experience.");
-    }
-  }
-
-  // Call this function when the page loads and on resize
-  window.addEventListener('load', handleOrientation);
-  window.addEventListener('resize', handleOrientation);
-
-  // Add this function to resize the canvas
-  function resizeCanvas() {
-    const canvas = document.getElementById('gameCanvas');
-    const container = document.getElementById('main');
-    const aspectRatio = 16 / 9; // Adjust this to match your game's aspect ratio
-
-    let newWidth = container.clientWidth;
-    let newHeight = container.clientHeight;
-
-    if (newWidth / newHeight > aspectRatio) {
-      newWidth = newHeight * aspectRatio;
-    } else {
-      newHeight = newWidth / aspectRatio;
-    }
-
-    canvas.style.width = `${newWidth}px`;
-    canvas.style.height = `${newHeight}px`;
-  }
-
-  // Call resizeCanvas when the page loads and on resize
-  window.addEventListener('load', resizeCanvas);
-  window.addEventListener('resize', resizeCanvas);
 });
