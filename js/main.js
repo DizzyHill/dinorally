@@ -145,9 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add this function to resize the canvas
   function resizeCanvas() {
-    const canvas = document.getElementById('gameCanvas');
+    const canvas = game.canvas;
     const container = document.getElementById('main');
-    const aspectRatio = 16 / 9; // Adjust this to match your game's aspect ratio
 
     let scale = Math.min(
         container.clientWidth / canvas.width,

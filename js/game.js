@@ -11,8 +11,8 @@ export default class Game {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = (this.canvas.width / 16) * 10;
+    this.canvas.width = 1280;
+    this.canvas.height = 720;
     this.gameWidth = this.canvas.width;
     this.gameHeight = this.canvas.height;
     this.collectableTypes = ['coin', 'powerup', 'shield']; // Add more types as needed
@@ -60,7 +60,7 @@ export default class Game {
   }
 
   initializeTrack() {
-    this.topBoundary = this.gameHeight / 2;
+    this.topBoundary = this.gameHeight  * 0.5;
     this.bottomBoundary = this.gameHeight;
     this.trackHeight = this.bottomBoundary - this.topBoundary;
     this.laneCount = 4;
