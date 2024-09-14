@@ -65,7 +65,7 @@ export default class Racer {
     // Load the frames
     for (let i = 1; i <= 4; i++) {
         const img = new Image();
-        img.src = `./assets/racers/${dinoName}/${dinoName}_${i}.png`;
+        img.src = `./assets/racers/${dinoName.toLowerCase()}/${dinoName.toLowerCase()}_${i}.png`;
         img.onload = () => {
           console.log(`Loaded image: ${img.src}`);
         };
