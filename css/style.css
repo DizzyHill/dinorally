@@ -67,8 +67,8 @@ canvas {
   height: 60px;
 }
 
-@media (min-width: 769px) {
+/* @media (min-width: 769px) {
   #mobile-controls {
     display: none;
   }
-}
+} */

@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add keyboard controls for player movement
   window.addEventListener('keydown', (e) => {
+    e.preventDefault();
     if (!game.player) return;
         
     game.player.isMoving = true;
