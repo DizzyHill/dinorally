@@ -12,10 +12,9 @@ export default class Game {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    this.canvas.height = (this.canvas.width / 16) * 10;
     this.gameWidth = this.canvas.width;
     this.gameHeight = this.canvas.height;
-
     this.collectableTypes = ['coin', 'powerup', 'shield']; // Add more types as needed
 
     this.initializeGameState();
