@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
       break;
       case 'e':
       case 'E':
+      case 'f':
+      case 'F':
         game.fireProjectile(game.player);
       break;
     }
