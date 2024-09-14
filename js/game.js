@@ -382,25 +382,4 @@ export default class Game {
     }
     return array;
   }
-
-  // Add this method to your Game class
-  resizeCanvas() {
-    const container = document.getElementById('main');
-    const aspectRatio = this.canvas.width / this.canvas.height;
-
-    let newWidth = container.clientWidth;
-    let newHeight = container.clientHeight;
-
-    if (newWidth / newHeight > aspectRatio) {
-      newWidth = newHeight * aspectRatio;
-    } else {
-      newHeight = newWidth / aspectRatio;
-    }
-
-    this.canvas.style.width = `${newWidth}px`;
-    this.canvas.style.height = `${newHeight}px`;
-
-    // Update game objects positions if necessary
-    // For example, you might need to adjust the player's position, obstacles, etc.
-  }
 }
