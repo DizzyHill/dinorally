@@ -77,8 +77,8 @@ canvas {
 
 @media screen and (orientation: portrait) {
     html {
-        transform: rotate(-90deg);
-        transform-origin: left top;
+        /* transform: rotate(-90deg);
+        transform-origin: left top; */
         width: 100vh;
         height: 100vw;
         overflow-x: hidden;
