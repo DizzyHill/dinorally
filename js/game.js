@@ -239,15 +239,6 @@ export default class Game {
     }
   }
 
-  shootProjectile() {
-    const projectile = this.player.shootProjectile();
-    if (projectile) {
-      projectile.x = this.player.x + this.player.width;
-      projectile.y = this.player.y + this.player.height / 2;
-      this.projectiles.push(projectile);
-    }
-  }
-
   collectCollectable(collectable, racer) {
     if (racer === this.player) {
       this.collectableCount++;

@@ -77,15 +77,6 @@ export default class Racer {
     this.laneNumber = this.lane.laneNumber; // Set the initial lane number
     this.originalSpeed = gameSpeed;
     this.lives = extraLives;
-    this.projectiles = [];
-    this.maxProjectiles = 3;
-  }
-
-  shootProjectile() {
-    if (this.projectiles.length > 0) {
-      return this.projectiles.pop();
-    }
-    return null;
   }
 
   hit() {
@@ -353,20 +344,21 @@ export default class Racer {
   }
 
   accelerate(isAccelerating, ogSpeed) {
-    // console.log("Accelerating: " + isAccelerating);
-    this.isAccelerating = isAccelerating;
-    const accelerationFactor = 1.5; // 5% increase
-    
-    if (this.isAccelerating) {
-      this.speed = ogSpeed * accelerationFactor;
-      // console.log("Speed: " + this.speed);
-    } else {
-      this.speed = ogSpeed;
-      // console.log("Speed: " + this.speed);
-    }
+    if (this.raceStarted) {
+      this.isAccelerating = isAccelerating;
+      const accelerationFactor = 1.5; // 5% increase
+      
+      if (this.isAccelerating) {
+        this.speed = ogSpeed * accelerationFactor;
+        // console.log("Speed: " + this.speed);
+      } else {
+        this.speed = ogSpeed;
+        // console.log("Speed: " + this.speed);
+      }
 
-    if (this.onSpeedChange) {
-      this.onSpeedChange(this.speed);
+      if (this.onSpeedChange) {
+        this.onSpeedChange(this.speed);
+      }
     }
   }
 

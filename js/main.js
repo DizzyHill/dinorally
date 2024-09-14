@@ -44,12 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       break;
       case 'f':
       case 'F':
-        const projectile = game.player.shootProjectile();
-        if (projectile) {
-          projectile.x = game.player.x + game.player.width;
-          projectile.y = game.player.y + game.player.height / 2;
-          game.projectiles.push(projectile);
-        }
+        game.fireProjectile(game.player);
       break;
     }
   });
