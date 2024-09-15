@@ -367,7 +367,7 @@ export default class Racer {
 
   boost(boostTime = 1000) {
     if (this.boosted) return;
-
+    this.jump();
     this.boosted = true;
     const originalSpeed = this.speed;
     this.speed *= 2;
