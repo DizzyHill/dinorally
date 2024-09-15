@@ -108,7 +108,7 @@ export default class Game {
   startRace() {
     this.themeMusic.play();
     this.racers.forEach(racer => racer.raceStarted = true);
-    this.gameSpeed = 5;
+    this.gameSpeed = 7.5;
     this.spawnObjects();
     this.increaseDifficulty();
   }

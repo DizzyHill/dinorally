@@ -1,0 +1,17 @@
+{
+  "short_name": "Dino Rally Rush",
+  "name": "Dino Rally Rush",
+  "id": "/",
+  "icons": [
+    {
+      "src": "./assets/dino-rally-rush-icon.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000"
+}
