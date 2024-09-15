@@ -46,10 +46,6 @@ export default class Projectile extends Collidable {
 
     if (frame.complete) {
       ctx.drawImage(frame, this.x, this.y, this.width, this.height);
-    } else {
-      // Fallback in case image hasn't loaded yet
-      ctx.fillStyle = "orange";
-      ctx.fillRect(this.x, this.y, this.width, this.height);
     }
   }
 

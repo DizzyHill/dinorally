@@ -176,10 +176,6 @@ export default class Racer {
 
       if (frame.complete) {
         ctx.drawImage(frame, this.x, this.y, this.width, this.height);
-      } else {
-        // Fallback in case image hasn't loaded yet
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
       }
     }
 

@@ -291,7 +291,7 @@ export default class Game {
   }
 
   fireProjectile(racer) {
-    if (racer.collectableCount > 0) {
+    if (racer.raceStarted && racer.collectableCount > 0) {
       const projectile = new Projectile(
         racer.x + racer.width,
         racer.y + racer.height / 2,
@@ -371,7 +371,7 @@ export default class Game {
     // this.drawCollectableTally();
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
-    console.log(this.gameSpeed)
+    // console.log(this.gameSpeed)
   }
 
   shuffleArray(array) {
