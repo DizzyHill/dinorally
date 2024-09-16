@@ -1,11 +1,14 @@
 body {
   text-align: center;
+  background-color: #fff7d4;
+  background: url("../assets/character_select/selectscreen_bg.jpg") no-repeat center center fixed;
+
 }
 canvas {
-  background-color: #87CEEB;
   display: block;
   margin: 20px auto;
   width: 90%;
+
 }
 
 
@@ -22,12 +25,8 @@ canvas {
 }
 
 .start-game {
-  background-color: #fff;
-  border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 5px 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
 .start-game:hover {
