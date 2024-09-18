@@ -5,12 +5,13 @@ export default class Racer {
   // static racerSound = new Audio('./assets/sounds/dino.mp3');
   static jumpSound = new Audio('./assets/sounds/jump.mp3');
 
-  constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false, extraLives = 0) {
+  constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false, extraLives = 0, racerSounds) {
     this.isBot = isBot;
     this.isPlayer = !this.isBot;
     this.track = track
     this.lane = lane; // Use the provided lane
     this.dinoName = dinoName;
+    this.racerSounds = racerSounds;
     // Dino-specific configurations
     switch(dinoName) {
       case 'Bash':
@@ -63,8 +64,7 @@ export default class Racer {
     this.shadowBaseHeight = this.height * 0.2; // Base height of the shadow
     // this.racerSound = Racer.racerSound;
     // this.racerSound.volume = 0.5;
-    this.jumpSound = Racer.jumpSound;
-    this.jumpSound.volume = 0.5;
+    this.jumpSound = this.racerSounds.jump;
 
     // Array to store frames
     this.frames = [];

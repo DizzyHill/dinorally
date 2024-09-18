@@ -1,15 +1,13 @@
 import Collidable from './collidable.js';
 
 export default class Projectile extends Collidable {
-  static explosionSound = new Audio('./assets/sounds/explosion.mp3');
-  static projectileSound = new Audio('./assets/sounds/fireball.mp3');
-
-  constructor(x, y, speed, lane, preloadedImages) {
+  constructor(x, y, speed, lane, preloadedImages, projectileSounds) {
     super(x, y, 100, 100, speed, lane); // Adjust width and height as needed
     this.preloadedImages = preloadedImages;
-    this.projectileSound = Projectile.projectileSound;
-    this.projectileSound.volume = 0.5;
-    this.explosionSound = Projectile.explosionSound;
+    this.projectileSounds = projectileSounds;
+    this.fireballSound = this.projectileSounds.fireball;
+    this.fireballSound.volume = 0.5;
+    this.explosionSound = this.projectileSounds.explosion;
     this.explosionSound.volume = 0.4;
     // Array to store frames
     this.frames = [];
@@ -52,7 +50,7 @@ export default class Projectile extends Collidable {
 
     if (frame.complete) {
       ctx.drawImage(frame, this.x, this.y, this.width, this.height);
-      this.projectileSound.play();
+      this.fireballSound.play();
     }
   }
 

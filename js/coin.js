@@ -1,10 +1,10 @@
 import Collidable from './collidable.js';
 
 export default class Coin extends Collidable {
-  constructor(x, y, speed, currentLane, preloadedImages) {
+  constructor(x, y, speed, currentLane, preloadedImages, coinSound) {
     super(x, y, 30, 30, speed, currentLane); // Adjust width and height as needed
     this.image = preloadedImages;
-    this.coinSound = new Audio('./assets/sounds/coin.mp3');
+    this.coinSound = coinSound;
     this.coinSound.volume = 0.5;  // Set volume (optional)
   }
 

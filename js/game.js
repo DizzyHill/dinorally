@@ -49,6 +49,15 @@ export default class Game {
   initializeAudio() {
     this.themeMusic = this.createAudio('./assets/sounds/theme.mp3', true, 0.5);
     this.gameOverSound = this.createAudio('./assets/sounds/game_over.mp3', false, 0.7);
+    this.coinSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
+    this.collectableSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
+    this.boostSound = this.createAudio('./assets/sounds/boost.mp3', false, 0.5);
+    this.fireballSound = this.createAudio('./assets/sounds/fireball.mp3', false, 0.5);
+    this.explosionSound = this.createAudio('./assets/sounds/explosion.mp3', false, 0.5);
+    this.racerSounds = {
+      // car: this.createAudio('./assets/sounds/car.mp3', false, 0.5),
+      jump: this.createAudio('./assets/sounds/jump.mp3', false, 0.5),
+    };
     // Add event listener for theme music loop
     this.themeMusic.addEventListener('ended', () => {
       this.themeMusic.playbackRate += 0.1; // Increase speed by 10% each loop
@@ -78,7 +87,7 @@ export default class Game {
       await Promise.all([
         this.preloadObstacleImages(),
         this.preloadProjectileImages(),
-        this.preloadRacerImages(),
+        // this.preloadRacerImages(),
         this.preloadBoostImages(),
         this.preloadCoinImages(),
         this.preloadCollectableImages(),
@@ -187,7 +196,7 @@ export default class Game {
     // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
     // Create Player
-    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1, this.preloadedImages['racers']);
+    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1, this.racerSounds);
     this.player.setSpeedChangeCallback(this.handlePlayerSpeedChange.bind(this));
     // Create Bots
     this.bots = this.createBots(dinoName, shuffledLanes.slice(1));
@@ -237,12 +246,12 @@ export default class Game {
   }
 
   createBots(chosenDino, availableLanes) {
-    const numBots = Math.min(2, availableLanes.length);
+    const numBots = Math.min(3, availableLanes.length);
     const dinoNames = this.dinos.filter(name => name !== chosenDino);
     
     return Array.from({ length: numBots }, (_, index) => {
       const randomDinoName = dinoNames[index % dinoNames.length];
-      return new Racer(randomDinoName, this.track, availableLanes[index], this.gameHeight, this.gameSpeed, this.gameWidth, true, 0, this.preloadedImages['racers']);
+      return new Racer(randomDinoName, this.track, availableLanes[index], this.gameHeight, this.gameSpeed, this.gameWidth, true, 0, this.racerSounds);
     });
   }
 
@@ -281,7 +290,8 @@ export default class Game {
       
       // Check if the category exists and has at least one image
       if (this.preloadedImages[objectName] && Object.keys(this.preloadedImages[objectName]).length > 0) {
-        let image;
+        let image, audio;
+        // Handle images
         if (objectName === "obstacles") {
           // Put each of the preloaded images into an array
           const imageArray = Object.values(this.preloadedImages[objectName]);
@@ -291,13 +301,25 @@ export default class Game {
           const imageUrl = Object.keys(this.preloadedImages[objectName])[0];
           image = this.preloadedImages[objectName][imageUrl];
         }
-        
+
+        // Handle audio
+        if (objectName === "obstacles") {
+          audio = this.explosionSound;
+        } else if (objectName === "collectables") {
+          audio = this.collectableSound;
+        } else if (objectName === "coins") {
+          audio = this.coinSound;
+        } else if (objectName === "boosts") {
+          audio = this.boostSound;
+        }
+
         const object = new ObjectClass(
           this.gameWidth + randomXOffset,
           lane.yPosition,
           this.gameSpeed,
           lane,
-          image
+          image,
+          audio
         );
         this.collidables.push(object);
       } else {
@@ -382,7 +404,8 @@ export default class Game {
     if (racer.lane !== item.lane) return false;
 
     const padding = item instanceof Obstacle ? { x: racer.width * 0.25, y: racer.height * 0.25 } : { x: 0, y: 0 };
-    return this.detectRectangularCollision(racer, item, padding.x, padding.y);
+    return this.detectRectangularCollision(racer, item, padding.x, 0);
+    // return this.detectRectangularCollision(racer, item);
   }
 
   detectRectangularCollision(obj1, obj2, paddingX = 0, paddingY = 0) {
@@ -440,12 +463,18 @@ export default class Game {
 
   fireProjectile(racer) {
     if (racer.raceStarted && racer.collectableCount > 0) {
+      const audio = {
+        fireball: this.fireballSound,
+        explosion: this.explosionSound
+      };
+
       const projectile = new Projectile(
         racer.x + racer.width,
         racer.y + racer.height / 2,
         this.gameSpeed * 1.5,
         racer.lane,
-        Object.values(this.preloadedImages["projectiles"])
+        Object.values(this.preloadedImages["projectiles"]), 
+        audio
       );
       this.projectiles.push(projectile);
       racer.collectableCount--;

@@ -1,10 +1,10 @@
 import Collidable from './collidable.js';
 
 export default class Boost extends Collidable {
-  constructor(x, y, speed, currentLane, preloadedImages) {
+  constructor(x, y, speed, currentLane, preloadedImages, boostSound) {
     super(x, y, 70, 50, speed, currentLane); // Adjust width and height as needed
     this.image = preloadedImages;
-    this.boostSound = new Audio('./assets/sounds/powerup.mp3');
+    this.boostSound = boostSound;
     this.boostSound.volume = 0.5;  // Set volume (optional)
   }
 
