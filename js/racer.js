@@ -2,6 +2,9 @@
 import { Tween, Easing } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js';
 
 export default class Racer {
+  // static racerSound = new Audio('./assets/sounds/dino.mp3');
+  static jumpSound = new Audio('./assets/sounds/jump.mp3');
+
   constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false, extraLives = 0) {
     this.isBot = isBot;
     this.isPlayer = !this.isBot;
@@ -58,6 +61,10 @@ export default class Racer {
 
     this.shadowBaseWidth = this.width * 0.8;  // Base size of the shadow
     this.shadowBaseHeight = this.height * 0.2; // Base height of the shadow
+    // this.racerSound = Racer.racerSound;
+    // this.racerSound.volume = 0.5;
+    this.jumpSound = Racer.jumpSound;
+    this.jumpSound.volume = 0.5;
 
     // Array to store frames
     this.frames = [];
@@ -67,7 +74,7 @@ export default class Racer {
         const img = new Image();
         img.src = `./assets/racers/${dinoName.toLowerCase()}/${dinoName.toLowerCase()}_${i}.png`;
         img.onload = () => {
-          console.log(`Loaded image: ${img.src}`);
+          // console.log(`Loaded image: ${img.src}`);
         };
         img.onerror = (e) => {
             console.error(`Failed to load image: ${img.src}`, e);
@@ -425,6 +432,7 @@ export default class Racer {
   jump() {
     if (!this.raceStarted || this.isJumping) return;
     if (!this.isJumping) {  // Ensure jump happens only once per press
+        this.jumpSound.play();
         this.isJumping = true;  // Set jumping flag
         this.jumpStartLane = this.lane; // Store the starting lane
         

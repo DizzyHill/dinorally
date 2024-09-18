@@ -1,2 +1,0 @@
-Color code for off white in background: fff7d4
-Color code for yellow color for character select background (If you need it) f2b711

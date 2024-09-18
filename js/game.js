@@ -16,13 +16,14 @@ export default class Game {
     this.gameWidth = this.canvas.width;
     this.gameHeight = this.canvas.height;
     this.collectableTypes = ['coin', 'powerup', 'shield']; // Add more types as needed
+    this.preloadedImages = {};
 
     this.initializeGameState();
     this.initializeAudio();
     this.initializeTrack();
   }
 
-  initializeGameState() {
+  async initializeGameState() {
     this.player = null;
     this.racers = [];
     this.bots = [];
@@ -40,6 +41,9 @@ export default class Game {
     this.bgX = 0;
     this.backgroundSpeed = 3;
     this.projectiles = [];
+    await this.preloadImages();
+    
+
   }
 
   initializeAudio() {
@@ -69,12 +73,121 @@ export default class Game {
     this.track.createLanes(this.laneCount);
   }
 
+  async preloadImages() {
+    try {
+      await Promise.all([
+        this.preloadObstacleImages(),
+        this.preloadProjectileImages(),
+        this.preloadRacerImages(),
+        this.preloadBoostImages(),
+        this.preloadCoinImages(),
+        this.preloadCollectableImages(),
+        this.preloadExplosionImages()
+      ]);
+      console.log('All images preloaded successfully');
+    } catch (error) {
+      console.error('Failed to preload images:', error);
+    }
+  }
+
+  preloadObstacleImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = [
+        './assets/obstacles/DR_VG_boulder(250x300).png',
+        './assets/obstacles/DR_VG_tire(250x350).png'
+      ];
+      this.loadImages(imagesToLoad, 'obstacles', resolve, reject);
+    });
+  }
+
+  preloadExplosionImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = [
+        './assets/fireball_explosion/explosion_1.png',
+        './assets/fireball_explosion/explosion_2.png',
+        './assets/fireball_explosion/explosion_3.png'
+      ];
+      this.loadImages(imagesToLoad, 'explosions', resolve, reject);
+    });
+  }
+
+  preloadProjectileImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = [
+        './assets/projectiles/fireball_1.png',
+        './assets/projectiles/fireball_2.png',
+        './assets/projectiles/fireball_3.png',
+        './assets/projectiles/fireball_4.png'
+      ];
+      this.loadImages(imagesToLoad, 'projectiles', resolve, reject);
+    });
+  }
+
+  preloadRacerImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = this.dinos.flatMap(dino => 
+        [1, 2, 3, 4].map(i => `./assets/racers/${dino.toLowerCase()}/${dino.toLowerCase()}_${i}.png`)
+      );
+      this.loadImages(imagesToLoad, 'racers', resolve, reject);
+    });
+  }
+
+  preloadBoostImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = ['./assets/boost/speedboost.png'];
+      this.loadImages(imagesToLoad, 'boosts', resolve, reject);
+    });
+  }
+
+  preloadCoinImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = ['./assets/collectables/DR_VG_pickleWeb(200x300).png'];
+      this.loadImages(imagesToLoad, 'coins', resolve, reject);
+    });
+  }
+
+  preloadCollectableImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = ['./assets/collectables/hot_sauce.png'];
+      this.loadImages(imagesToLoad, 'collectables', resolve, reject);
+    });
+  }
+
+  loadImages(imageSources, category, resolve, reject) {
+    let loadedCount = 0;
+    const totalImages = imageSources.length;
+
+    const onLoad = () => {
+      loadedCount++;
+      if (loadedCount === totalImages) {
+        console.log(`All ${category} images loaded successfully`);
+        resolve();
+      }
+    };
+
+    const onError = (src) => {
+      console.error(`Failed to load image: ${src}`);
+      reject(new Error(`Failed to load image: ${src}`));
+    };
+
+    imageSources.forEach(src => {
+      const img = new Image();
+      img.onload = onLoad;
+      img.onerror = () => onError(src);
+      img.src = src;
+      if (!this.preloadedImages[category]) {
+        this.preloadedImages[category] = {};
+      }
+      this.preloadedImages[category][src] = img;
+    });
+  }
+
   startGame(dinoName) {
     document.getElementById('character-selection').style.display = 'none';
     // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
     // Create Player
-    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1);
+    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1, this.preloadedImages['racers']);
     this.player.setSpeedChangeCallback(this.handlePlayerSpeedChange.bind(this));
     // Create Bots
     this.bots = this.createBots(dinoName, shuffledLanes.slice(1));
@@ -129,7 +242,7 @@ export default class Game {
     
     return Array.from({ length: numBots }, (_, index) => {
       const randomDinoName = dinoNames[index % dinoNames.length];
-      return new Racer(randomDinoName, this.track, availableLanes[index], this.gameHeight, this.gameSpeed, this.gameWidth, true);
+      return new Racer(randomDinoName, this.track, availableLanes[index], this.gameHeight, this.gameSpeed, this.gameWidth, true, 0, this.preloadedImages['racers']);
     });
   }
 
@@ -157,10 +270,39 @@ export default class Game {
   }
 
   spawnObject(ObjectClass, probability, lane) {
+    const objectName = ObjectClass.name.toLowerCase() + 's'; // Add 's' to match the preloaded image categories
     if (Math.random() < probability) {
-      const randomXOffset = Math.random() * (this.gameWidth / 2); // Random offset within half the game width
-      const object = new ObjectClass(this.gameWidth + randomXOffset, lane.yPosition, this.gameSpeed, lane);
-      this.collidables.push(object);
+      const randomXOffset = Math.random() * (this.gameWidth / 2);
+      
+      // // Debug logging
+      // console.log('Object name:', objectName);
+      // console.log('Preloaded images:', this.preloadedImages);
+      // console.log('Image category:', this.preloadedImages[objectName]);
+      
+      // Check if the category exists and has at least one image
+      if (this.preloadedImages[objectName] && Object.keys(this.preloadedImages[objectName]).length > 0) {
+        let image;
+        if (objectName === "obstacles") {
+          // Put each of the preloaded images into an array
+          const imageArray = Object.values(this.preloadedImages[objectName]);
+          image = imageArray;
+        } else {
+          // Get the first image URL from the category
+          const imageUrl = Object.keys(this.preloadedImages[objectName])[0];
+          image = this.preloadedImages[objectName][imageUrl];
+        }
+        
+        const object = new ObjectClass(
+          this.gameWidth + randomXOffset,
+          lane.yPosition,
+          this.gameSpeed,
+          lane,
+          image
+        );
+        this.collidables.push(object);
+      } else {
+        console.error(`No preloaded images found for category: ${objectName}`);
+      }
     }
   }
 
@@ -209,6 +351,7 @@ export default class Game {
       for (const racer of this.racers) {
         if (racer !== this.player && this.detectCollision(projectile, racer)) {
           racer.stall(3000);
+          projectile.explosionSound.play();
           return false; // Remove the projectile
         }
       }
@@ -216,6 +359,7 @@ export default class Game {
       for (const obstacle of this.collidables.filter(obj => obj instanceof Obstacle)) {
         if (this.detectCollision(projectile, obstacle)) {
           this.explodeObstacle(obstacle);
+          projectile.explosionSound.play();
           return false; // Remove the projectile
         }
       }
@@ -226,7 +370,11 @@ export default class Game {
 
   explodeObstacle(obstacle) {
     // Remove the obstacle from collidables
-    this.collidables = this.collidables.filter(obj => obj !== obstacle);
+    const explosionImages = Object.values(this.preloadedImages['explosions']);
+    obstacle.animateExplosion(explosionImages);
+    setTimeout(() => {
+      this.collidables = this.collidables.filter(obj => obj !== obstacle);
+    }, 300);
     // You can add explosion effects or sounds here
   }
 
@@ -296,7 +444,8 @@ export default class Game {
         racer.x + racer.width,
         racer.y + racer.height / 2,
         this.gameSpeed * 1.5,
-        racer.lane
+        racer.lane,
+        Object.values(this.preloadedImages["projectiles"])
       );
       this.projectiles.push(projectile);
       racer.collectableCount--;
