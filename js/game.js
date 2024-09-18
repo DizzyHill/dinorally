@@ -349,7 +349,7 @@ export default class Game {
   }
 
   updateObjects() {
-    this.collidables = this.collidables.filter((obj, index) => {
+    this.collidables = this.collidables.filter((obj) => {
       obj.update();
       obj.draw(this.ctx);
       
@@ -361,7 +361,8 @@ export default class Game {
         }
       }
       
-      return obj.x + obj.width >= 0;
+      // Remove objects that have left the screen
+      return obj.x + obj.width > 0;
     });
 
     // Update and draw projectiles
@@ -386,7 +387,8 @@ export default class Game {
         }
       }
 
-      return !projectile.isOffScreen(this.gameWidth);
+      // Remove projectiles that have left the screen
+      return projectile.x < this.gameWidth;
     });
   }
 
