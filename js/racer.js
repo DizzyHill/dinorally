@@ -328,7 +328,7 @@ export default class Racer {
       this.laneNumber = this.lane.laneNumber;
       
       // Smoothly move to the new lane's center
-      const newY = (this.lane.topBoundary + this.lane.bottomBoundary) / 2 - this.height / 2;
+      const newY = (this.lane.topBoundary + this.lane.bottomBoundary) / 2 - this.height;
       new Tween(this)
         .to({ y: newY }, 500) // 500ms duration, adjust as needed
         .easing(Easing.Quadratic.InOut)
@@ -466,16 +466,18 @@ export default class Racer {
 
   moveUp() {
     if (!this.raceStarted) return;
-    if (this.dy > -this.maxSpeed) {
-        this.dy -= this.acceleration;  // Accelerate upwards
-    }
+    // if (this.dy > -this.maxSpeed) {
+    //     this.dy -= this.acceleration;  // Accelerate upwards
+    // }
+    this.changeLane(true);
   }
 
   moveDown() {
     if (!this.raceStarted) return;
-    if (this.dy < this.maxSpeed) {
-        this.dy += this.acceleration;  // Accelerate downwards
-    }
+    // if (this.dy < this.maxSpeed) {
+    //     this.dy += this.acceleration;  // Accelerate downwards
+    // }
+    this.changeLane(false);
   }
 
   // moveLeft() {
