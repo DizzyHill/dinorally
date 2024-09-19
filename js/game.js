@@ -3,6 +3,7 @@ import Racer from './racer.js';
 import Obstacle from './obstacle.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
+import CoinJar from './coinJar.js';
 import Track from './track.js';
 import Collectable from './collectable.js';
 import Projectile from './projectile.js';
@@ -49,7 +50,7 @@ export default class Game {
   initializeAudio() {
     this.themeMusic = this.createAudio('./assets/sounds/theme.mp3', true, 0.5);
     this.gameOverSound = this.createAudio('./assets/sounds/game_over.mp3', false, 0.7);
-    this.coinSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
+    // this.coinSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
     this.collectableSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
     this.boostSound = this.createAudio('./assets/sounds/boost.mp3', false, 0.5);
     this.fireballSound = this.createAudio('./assets/sounds/fireball.mp3', false, 0.5);
@@ -90,6 +91,7 @@ export default class Game {
         // this.preloadRacerImages(),
         this.preloadBoostImages(),
         this.preloadCoinImages(),
+        this.preloadCoinJarImages(),
         this.preloadCollectableImages(),
         this.preloadExplosionImages()
       ]);
@@ -152,6 +154,13 @@ export default class Game {
     return new Promise((resolve, reject) => {
       const imagesToLoad = ['./assets/collectables/DR_VG_pickleWeb(200x300).png'];
       this.loadImages(imagesToLoad, 'coins', resolve, reject);
+    });
+  }
+  
+  preloadCoinJarImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = ['./assets/collectables/DR_VG_PickleJar(300x200).png'];
+      this.loadImages(imagesToLoad, 'coinjars', resolve, reject);
     });
   }
 
@@ -269,9 +278,10 @@ export default class Game {
     });
 
     // Keep other object spawn rates similar
-    this.spawnObject(Boost, this.difficulty_level * 0.03, lanes[1]);
-    this.spawnObject(Coin, this.difficulty_level * 0.1, lanes[2]);
-    this.spawnObject(Collectable, this.difficulty_level * 0.01, lanes[3]);
+    this.spawnObject(Boost, 0.15, lanes[1]);
+    this.spawnObject(Coin, 0.5, lanes[2]);
+    this.spawnObject(CoinJar, 0.05, lanes[2]);
+    this.spawnObject(Collectable, 0.05, lanes[3]);
 
     // Decrease spawn interval as difficulty increases
     const spawnInterval = Math.max(200, 1000 - this.difficulty_level * 50);
@@ -305,10 +315,8 @@ export default class Game {
         // Handle audio
         if (objectName === "obstacles") {
           audio = this.explosionSound;
-        } else if (objectName === "collectables") {
+        } else if (objectName === "collectables" || objectName === "coins" || objectName === "coinjars") {
           audio = this.collectableSound;
-        } else if (objectName === "coins") {
-          audio = this.coinSound;
         } else if (objectName === "boosts") {
           audio = this.boostSound;
         }
@@ -428,6 +436,8 @@ export default class Game {
       this.updateSpeeds();
     } else if (obj instanceof Coin) {
       this.collectCoin(obj, racer);
+    } else if (obj instanceof CoinJar) {
+      this.collectCoin(obj, racer, 3);
     } else if (obj instanceof Obstacle) {
       if (racer === this.player) {
         if (this.player.hit()) {
@@ -453,9 +463,9 @@ export default class Game {
     }
   }
 
-  collectCoin(coin, racer) {
+  collectCoin(coin, racer, count = 1) {
     if (racer === this.player) {
-      this.coinCount++;
+      this.coinCount += count;
       coin.playCoinSound();
     } else {
       // Optionally track bot coin collection

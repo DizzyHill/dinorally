@@ -1,8 +1,8 @@
 import Collidable from './collidable.js';
 
-export default class Coin extends Collidable {
+export default class CoinJar extends Collidable {
   constructor(x, y, speed, currentLane, preloadedImages, coinSound) {
-    super(x, y, 30, 40, speed, currentLane); // Adjust width and height as needed
+    super(x, y, 50, 60, speed, currentLane); // Adjust width and height as needed
     this.image = preloadedImages;
     this.coinSound = coinSound;
     this.coinSound.volume = 0.5;  // Set volume (optional)
