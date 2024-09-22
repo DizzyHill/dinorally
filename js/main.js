@@ -1,6 +1,5 @@
 import Game from './game.js';  // Assuming all your JS files are in the same folder
 
-document.getElementById('character-selection').style.display = 'flex';  // Show character selection menu
 
 document.addEventListener('DOMContentLoaded', () => {
   const game = new Game('gameCanvas');  // Initialize the game with the canvas element

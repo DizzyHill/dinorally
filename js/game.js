@@ -201,7 +201,7 @@ export default class Game {
   }
 
   startGame(dinoName) {
-    document.getElementById('character-selection').style.display = 'none';
+    document.getElementById('character-selection').classList.add('hidden');
     // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
     // Create Player
@@ -246,9 +246,14 @@ export default class Game {
 
   stopGame() {
     this.isGameRunning = false;
-    document.getElementById('start_over').style.display = 'flex';
-    document.getElementById('coin-count').innerHTML = this.coinCount;
-    document.getElementById('difficulty').innerHTML = this.difficulty_level;
+    document.getElementById('start_over').classList.remove('hidden');
+    // Loop through all racers to update their scores
+    this.racers.forEach(racer => {
+      const scoreElement = document.getElementById(`${racer.dinoName.toLowerCase()}-score`);
+      if (scoreElement) {
+        scoreElement.innerHTML = racer.coinCount || 0;
+      }
+    });
     this.themeMusic.pause();
     this.themeMusic.currentTime = 0;
     this.gameOverSound.play();
@@ -464,12 +469,9 @@ export default class Game {
   }
 
   collectCoin(coin, racer, count = 1) {
-    if (racer === this.player) {
-      this.coinCount += count;
+    racer.coinCount = (racer.coinCount || 0) + 1;
+    if (racer === this.player) { 
       coin.playCoinSound();
-    } else {
-      // Optionally track bot coin collection
-      racer.coinCount = (racer.coinCount || 0) + 1;
     }
   }
 

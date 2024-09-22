@@ -12,13 +12,10 @@ canvas {
 
 
 #character-selection, #start_over {
-  display: none;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 10px;
-  padding: 20px;
   text-align: center;
   z-index: 1;
 }
