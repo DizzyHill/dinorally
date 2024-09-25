@@ -44,7 +44,8 @@ export default class Game {
     this.backgroundSpeed = 3;
     this.projectiles = [];
     await this.preloadImages();
-    
+    this.drawBackground();
+
 
   }
 
@@ -222,12 +223,12 @@ export default class Game {
     // Combine Racers
     this.racers = [this.player, ...this.bots];
     this.resetGameState();
-    this.drawBackground();
   }
 
   startGame() {  
     document.getElementById('collectable-count').classList.remove('hidden');  
     document.getElementById('rules').classList.add('hidden');
+    document.getElementById('mobile-controls').classList.remove('hidden');
     this.playCountdown();
     this.gameLoop();
 
@@ -263,6 +264,7 @@ export default class Game {
     this.isGameRunning = false;
     document.getElementById('start_over').classList.remove('hidden');
     document.getElementById('collectable-count').classList.add('hidden');
+    document.getElementById('mobile-controls').classList.add('hidden');
     // Loop through all racers to update their scores
     this.racers.forEach(racer => {
       const scoreElement = document.getElementById(`${racer.dinoName.toLowerCase()}-score`);

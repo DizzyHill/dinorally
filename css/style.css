@@ -1,13 +1,14 @@
 body {
   text-align: center;
-  background-color: #fff7d4;
 
 }
 canvas {
   
 }
 
-
+#character-selection {
+  background-color: #fff7d4;
+}
 #character-selection, #start_over {
   position: absolute;
   top: 50%;
@@ -65,8 +66,6 @@ canvas {
     bottom: 10px;
     left: 10px;
     right: 10px;
-    display: flex;
-    justify-content: space-between;
 }
 
 /* .left-controls, .right-controls {
