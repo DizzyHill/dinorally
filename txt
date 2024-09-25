@@ -1,0 +1,14 @@
+Score Page Headline: Google font is Pacifico. Color Hex Code:e53f1f
+Body text: Arial
+Make Headline Text larger than body copy by roughly 2.5x
+
+Body Copy: You got x pickles
+Headline Copy (ideally these would be randomized)
+Rock On!
+Way to Go!
+Whoa Doggies!
+Look at You!
+Say it ain't So!
+Boom!
+Fantastic!
+*Background image added to assets file
