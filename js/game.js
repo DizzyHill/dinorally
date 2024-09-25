@@ -209,9 +209,9 @@ export default class Game {
     });
   }
 
-  startGame(dinoName) {
+  setUpGame(dinoName) {
     document.getElementById('character-selection').classList.add('hidden');
-    document.getElementById('collectable-count').classList.remove('hidden');
+    document.getElementById('rules').classList.remove('hidden');
     // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
     // Create Player
@@ -221,8 +221,13 @@ export default class Game {
     this.bots = this.createBots(dinoName, shuffledLanes.slice(1));
     // Combine Racers
     this.racers = [this.player, ...this.bots];
-    
     this.resetGameState();
+    this.drawBackground();
+  }
+
+  startGame() {  
+    document.getElementById('collectable-count').classList.remove('hidden');  
+    document.getElementById('rules').classList.add('hidden');
     this.playCountdown();
     this.gameLoop();
 
@@ -298,7 +303,7 @@ export default class Game {
     this.spawnObject(Coin, 0.5, lanes[2]);
     this.spawnObject(CoinJar, 0.05, lanes[2]);
     this.spawnObject(Collectable, 0.05, lanes[3]);
-    this.spawnObject(Heart, 0.01, lanes[3]);
+    this.spawnObject(Heart, 0.03, lanes[3]);
 
     // Decrease spawn interval as difficulty increases
     const spawnInterval = Math.max(200, 1000 - this.difficulty_level * 50);
@@ -332,7 +337,7 @@ export default class Game {
         // Handle audio
         if (objectName === "obstacles") {
           audio = this.explosionSound;
-        } else if (objectName === "collectables" || objectName === "coins" || objectName === "coinjars") {
+        } else if (objectName === "collectables" || objectName === "coins" || objectName === "coinjars" || objectName === "hearts") {
           audio = this.collectableSound;
         } else if (objectName === "boosts") {
           audio = this.boostSound;
@@ -455,6 +460,8 @@ export default class Game {
       this.collectCoin(obj, racer);
     } else if (obj instanceof CoinJar) {
       this.collectCoin(obj, racer, 3);
+    } else if (obj instanceof Heart) {
+      this.collectHeart(obj, racer);
     } else if (obj instanceof Obstacle) {
       if (racer === this.player) {
         if (this.player.hit()) {
@@ -481,9 +488,16 @@ export default class Game {
   }
 
   collectCoin(coin, racer, count = 1) {
-    racer.coinCount = (racer.coinCount || 0) + 1;
+    racer.coinCount = (racer.coinCount || 0) + count;
     if (racer === this.player) { 
       coin.playCoinSound();
+    }
+  }
+
+  collectHeart(heart, racer) {
+    if (racer === this.player) {
+      racer.lives = (racer.lives || 0) + 1;
+      heart.playCollectSound();
     }
   }
 

@@ -4,14 +4,22 @@ import Game from './game.js';  // Assuming all your JS files are in the same fol
 document.addEventListener('DOMContentLoaded', () => {
   const game = new Game('gameCanvas');  // Initialize the game with the canvas element
   const startButtons = document.querySelectorAll('.start-game');
+  const startRaceButton = document.getElementById('start-race');
   
   // Listen for the character selection button click
   startButtons.forEach(button => {
     button.addEventListener('click', (e) => {
+      e.preventDefault();
       const dinoName = e.target.getAttribute('data-dinoName');
       console.log("Selected dino: ", dinoName);
-      game.startGame(dinoName);  // Start the game with the selected dino character
+      game.setUpGame(dinoName);  // Start the game with the selected dino character
     });
+  });
+
+  startRaceButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log("Starting Race");
+    game.startGame();
   });
   
   // Mobile control buttons
