@@ -6,6 +6,7 @@ import Coin from './coin.js';
 import CoinJar from './coinJar.js';
 import Track from './track.js';
 import Collectable from './collectable.js';
+import Heart from './heart.js';
 import Projectile from './projectile.js';
 
 export default class Game {
@@ -93,6 +94,7 @@ export default class Game {
         this.preloadCoinImages(),
         this.preloadCoinJarImages(),
         this.preloadCollectableImages(),
+        this.preloadHeartImages(),
         this.preloadExplosionImages()
       ]);
       console.log('All images preloaded successfully');
@@ -171,6 +173,13 @@ export default class Game {
     });
   }
 
+  preloadHeartImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = ['./assets/collectables/HeartIcon.png'];
+      this.loadImages(imagesToLoad, 'hearts', resolve, reject);
+    });
+  }
+
   loadImages(imageSources, category, resolve, reject) {
     let loadedCount = 0;
     const totalImages = imageSources.length;
@@ -202,6 +211,7 @@ export default class Game {
 
   startGame(dinoName) {
     document.getElementById('character-selection').classList.add('hidden');
+    document.getElementById('collectable-count').classList.remove('hidden');
     // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
     // Create Player
@@ -247,6 +257,7 @@ export default class Game {
   stopGame() {
     this.isGameRunning = false;
     document.getElementById('start_over').classList.remove('hidden');
+    document.getElementById('collectable-count').classList.add('hidden');
     // Loop through all racers to update their scores
     this.racers.forEach(racer => {
       const scoreElement = document.getElementById(`${racer.dinoName.toLowerCase()}-score`);
@@ -287,6 +298,7 @@ export default class Game {
     this.spawnObject(Coin, 0.5, lanes[2]);
     this.spawnObject(CoinJar, 0.05, lanes[2]);
     this.spawnObject(Collectable, 0.05, lanes[3]);
+    this.spawnObject(Heart, 0.01, lanes[3]);
 
     // Decrease spawn interval as difficulty increases
     const spawnInterval = Math.max(200, 1000 - this.difficulty_level * 50);
@@ -509,39 +521,42 @@ export default class Game {
   }
 
   drawCoinTally() {
-    this.drawInfoBox(`Pickles: ${this.coinCount}`, this.gameWidth - 170, 10, 150, 40);
+    // this.drawInfoBox(`Pickles: ${this.coinCount}`, this.gameWidth - 170, 10, 150, 40);
+    document.getElementById('coin-count').innerHTML = this.player.coinCount;
   }
 
-  // drawCollectableTally() {
-  //   this.drawInfoBox(`Acorns: ${this.player.collectableCount}`, this.gameWidth / 2 - 75, 10, 150, 40);
-  // }
+  drawLivesTally() {
+    // this.drawInfoBox(`Acorns: ${this.player.collectableCount}`, this.gameWidth / 2 - 75, 10, 150, 40);
+    document.getElementById('heart-count').innerHTML = this.player.lives;
+  }
 
   drawFireBallTally() {
-    this.drawInfoBox(`Fire Balls: ${this.player.collectableCount}`, 20, 10, 180, 40);
+    // this.drawInfoBox(`Fire Balls: ${this.player.collectableCount}`, 20, 10, 180, 40);
+    document.getElementById('fireball-count').innerHTML = this.player.collectableCount;
   }
 
-  drawInfoBox(text, x, y, width, height) {
-    this.ctx.font = '20px Arial';
-    this.ctx.fillStyle = 'white';
-    this.drawRoundedRect(x, y, width, height);
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillText(text, x + 10, y + 27);
-  }
+  // drawInfoBox(text, x, y, width, height) {
+  //   this.ctx.font = '20px Arial';
+  //   this.ctx.fillStyle = 'white';
+  //   this.drawRoundedRect(x, y, width, height);
+  //   this.ctx.fillStyle = 'black';
+  //   this.ctx.fillText(text, x + 10, y + 27);
+  // }
 
-  drawRoundedRect(x, y, width, height) {
-    this.ctx.beginPath();
-    this.ctx.moveTo(x + 10, y);
-    this.ctx.lineTo(x + width - 10, y);
-    this.ctx.quadraticCurveTo(x + width, y, x + width, y + 10);
-    this.ctx.lineTo(x + width, y + height - 10);
-    this.ctx.quadraticCurveTo(x + width, y + height, x + width - 10, y + height);
-    this.ctx.lineTo(x + 10, y + height);
-    this.ctx.quadraticCurveTo(x, y + height, x, y + height - 10);
-    this.ctx.lineTo(x, y + 10);
-    this.ctx.quadraticCurveTo(x, y, x + 10, y);
-    this.ctx.closePath();
-    this.ctx.fill();
-  }
+  // drawRoundedRect(x, y, width, height) {
+  //   this.ctx.beginPath();
+  //   this.ctx.moveTo(x + 10, y);
+  //   this.ctx.lineTo(x + width - 10, y);
+  //   this.ctx.quadraticCurveTo(x + width, y, x + width, y + 10);
+  //   this.ctx.lineTo(x + width, y + height - 10);
+  //   this.ctx.quadraticCurveTo(x + width, y + height, x + width - 10, y + height);
+  //   this.ctx.lineTo(x + 10, y + height);
+  //   this.ctx.quadraticCurveTo(x, y + height, x, y + height - 10);
+  //   this.ctx.lineTo(x, y + 10);
+  //   this.ctx.quadraticCurveTo(x, y, x + 10, y);
+  //   this.ctx.closePath();
+  //   this.ctx.fill();
+  // }
 
   gameLoop() {
     if (!this.isGameRunning) {
@@ -560,7 +575,7 @@ export default class Game {
 
     this.drawCoinTally();
     this.drawFireBallTally();
-    // this.drawCollectableTally();
+    this.drawLivesTally();
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
     // console.log(this.gameSpeed)

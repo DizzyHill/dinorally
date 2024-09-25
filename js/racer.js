@@ -91,6 +91,7 @@ export default class Racer {
     this.originalSpeed = gameSpeed;
     this.lives = extraLives;
     this.collectableCount = 3;
+    this.coinCount = 0;
   }
 
   hit() {
