@@ -80,57 +80,57 @@
 
         <div id="rules" class="hidden z-10 w-full h-full absolute top-0 left-0 flex-auto flex flex-col items-center justify-center">
             <img class="w-3/4 mx-auto" src="./assets/Rules.png" alt="Dino Rally Rush Rules" />
-            <button id="start-race" class="px-8 py-4 border-4 border-yellow-500 bg-red-500 text-white text-2xl shadow-2xl rounded-xl -mt-20 uppercase font-black">Start Race</button>
+            <button id="start-race" class="px-4 px-2 md:px-8 md:py-4 border-4 border-yellow-500 bg-red-500 text-white text-lg md:text-2xl shadow-2xl rounded-xl md:-mt-20 uppercase font-black">Start Race</button>
         </div>
 
         <canvas id="gameCanvas" class="w-full border-y-8 border-red-500 absolute top-0 md:top-auto left-0"></canvas>
 
         <!-- Results screen -->
-        <div id="start_over" class="hidden w-3/4 md:w-1/2 shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
-            <div class="border-8 border-orange-500 rounded-2xl bg-yellow-500">
-                <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-4 bg-white">
+        <div id="start_over" class="hidden w-3/4 md:w-1/2 h-full md:h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
+            <div class="border-8 border-orange-500 rounded-2xl bg-yellow-500 h-full">
+                <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-2 md:p-4 bg-white h-full overflow-y-scroll">
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 py-2">
-                            <img class="w-1/2 mx-auto" src="./assets/leaderboard/results.png" alt="Results" />
+                        <div class="col-span-2 py-1 md:py-2">
+                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/results.png" alt="Results" />
                         </div>
                         <div class="col-span-1">
-                            <img class="w-1/4 mx-auto" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
+                            <img class="w-1/6 md:w-1/4 mx-auto" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-2">
-                            <img class="w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_nitro.png" alt="Nitro" />
+                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_nitro.png" alt="Nitro" />
                         </div>
                         <div class="col-span-1">
                             <div id="nitro-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-2">
-                            <img class="w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_comet.png" alt="Comet" />
+                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_comet.png" alt="Comet" />
                         </div>
                         <div class="col-span-1">
                             <div id="comet-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-2">
-                            <img class="w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_fuego.png" alt="Fuego" />
+                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_fuego.png" alt="Fuego" />
                         </div>
                         <div class="col-span-1">
                             <div id="fuego-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-2">
-                            <img class="w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_bash.png" alt="Bash" />
+                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_bash.png" alt="Bash" />
                         </div>
                         <div class="col-span-1">
                             <div id="bash-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
                         </div>
                     </div>
                     
-                    <button class="px-4 py-2 border-4 border-yellow-500 bg-red-500 text-white rounded-xl mt-8 uppercase font-black" onclick="window.location.reload()">Play Again</button>
+                    <button class="px-4 py-2 border-4 border-yellow-500 bg-red-500 text-white rounded-xl mt-2 md:mt-8 uppercase font-black" onclick="window.location.reload()">Play Again</button>
                 </div>
             </div>
         </div>
