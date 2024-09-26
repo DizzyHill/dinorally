@@ -1,13 +1,5 @@
 import Game from './game.js';  // Assuming all your JS files are in the same folder
 
-
-// Lock the orientation to landscape if on a mobile device
-if ('screen' in window && 'orientation' in window.screen && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-  window.screen.orientation.lock('landscape').catch((error) => {
-    console.error('Failed to lock orientation:', error);
-  });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const game = new Game('gameCanvas');  // Initialize the game with the canvas element
   const startButtons = document.querySelectorAll('.start-game');
