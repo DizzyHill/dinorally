@@ -90,7 +90,7 @@ export default class Game {
       await Promise.all([
         this.preloadObstacleImages(),
         this.preloadProjectileImages(),
-        // this.preloadRacerImages(),
+        this.preloadRacerImages(),
         this.preloadBoostImages(),
         this.preloadCoinImages(),
         this.preloadCoinJarImages(),
@@ -142,7 +142,38 @@ export default class Game {
       const imagesToLoad = this.dinos.flatMap(dino => 
         [1, 2, 3, 4].map(i => `./assets/racers/${dino.toLowerCase()}/${dino.toLowerCase()}_${i}.png`)
       );
-      this.loadImages(imagesToLoad, 'racers', resolve, reject);
+      this.loadImagesGrouped(imagesToLoad, 'racers', resolve, reject);
+    });
+  }
+  
+  loadImagesGrouped(imageSources, category, resolve, reject) {
+    // Initialize the category if not already present
+    if (!this.preloadedImages[category]) {
+      this.preloadedImages[category] = {};
+    }
+  
+    // Group images by dinoName
+    imageSources.forEach(src => {
+      const dinoName = src.split('/')[3]; // Assuming the path is ./assets/racers/dinoName/image.png
+      if (!this.preloadedImages[category][dinoName]) {
+        this.preloadedImages[category][dinoName] = [];
+      }
+  
+      const img = new Image();
+      img.onload = () => {
+        // Check if all images are loaded
+        const allLoaded = imageSources.every(src => this.preloadedImages[category][dinoName].length === 4);
+        if (allLoaded) {
+          console.log(`All ${category} images loaded successfully for ${dinoName}`);
+          resolve();
+        }
+      };
+      img.onerror = () => {
+        console.error(`Failed to load image: ${src}`);
+        reject(new Error(`Failed to load image: ${src}`));
+      };
+      img.src = src;
+      this.preloadedImages[category][dinoName].push(img);
     });
   }
 
@@ -213,10 +244,28 @@ export default class Game {
   setUpGame(dinoName) {
     document.getElementById('character-selection').classList.add('hidden');
     document.getElementById('rules').classList.remove('hidden');
+
     // Shuffle Lanes
     const shuffledLanes = this.shuffleArray([...this.track.lanes]);
+
+    // **Filter Preloaded Images for the Selected Dino**
+    const racerImages = this.preloadedImages['racers'][dinoName.toLowerCase()];
+
     // Create Player
-    this.player = new Racer(dinoName, this.track, shuffledLanes[0], this.gameHeight, this.gameSpeed, this.gameWidth, false, 1, this.racerSounds);
+    this.player = new Racer(
+      dinoName, 
+      this.track, 
+      shuffledLanes[0], 
+      this.gameHeight, 
+      this.gameSpeed, 
+      this.gameWidth, 
+      false, 
+      1, 
+      this.racerSounds, 
+      racerImages
+      );
+
+    // Set callback for speed changes
     this.player.setSpeedChangeCallback(this.handlePlayerSpeedChange.bind(this));
     // Create Bots
     this.bots = this.createBots(dinoName, shuffledLanes.slice(1));
@@ -283,7 +332,20 @@ export default class Game {
     
     return Array.from({ length: numBots }, (_, index) => {
       const randomDinoName = dinoNames[index % dinoNames.length];
-      return new Racer(randomDinoName, this.track, availableLanes[index], this.gameHeight, this.gameSpeed, this.gameWidth, true, 0, this.racerSounds);
+      const racerImages = this.preloadedImages['racers'][randomDinoName.toLowerCase()];
+
+      return new Racer(
+        randomDinoName, 
+        this.track, 
+        availableLanes[index], 
+        this.gameHeight, 
+        this.gameSpeed, 
+        this.gameWidth, 
+        true, 
+        0, 
+        this.racerSounds,
+        racerImages
+      );
     });
   }
 

@@ -7,11 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Listen for the character selection button click
   startButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
+    button.addEventListener('click', async (e) => {
       e.preventDefault();
       const dinoName = e.target.getAttribute('data-dinoName');
       console.log("Selected dino: ", dinoName);
       game.setUpGame(dinoName);  // Start the game with the selected dino character
+      
+      // Attempt to lock orientation when starting the game
+      await requestFullscreenAndLockOrientation();
     });
   });
 
@@ -166,4 +169,57 @@ document.addEventListener('DOMContentLoaded', () => {
   // Call resizeCanvas when the page loads and on resize
   window.addEventListener('load', resizeCanvas);
   window.addEventListener('resize', resizeCanvas);
+});
+
+// Function to request fullscreen and lock orientation
+async function requestFullscreenAndLockOrientation() {
+  const mainContainer = document.getElementById('main'); // Select the main container for fullscreen
+  
+  // Request fullscreen on the main container or body
+  if (mainContainer.requestFullscreen) {
+    await mainContainer.requestFullscreen();
+  } else if (mainContainer.webkitRequestFullscreen) { /* Safari */
+    await mainContainer.webkitRequestFullscreen();
+  } else if (mainContainer.msRequestFullscreen) { /* IE11 */
+    await mainContainer.msRequestFullscreen();
+  }
+
+  // Lock orientation to landscape
+  if (screen.orientation && screen.orientation.lock) {
+    try {
+      await screen.orientation.lock('landscape');
+      console.log('Orientation locked to landscape');
+    } catch (error) {
+      console.error('Orientation lock failed:', error);
+    }
+  } else if (window.screen.lockOrientation) {
+    // Deprecated methods for older browsers
+    const success = screen.lockOrientation('landscape');
+    if (success) {
+      console.log('Orientation locked to landscape using deprecated method');
+    } else {
+      console.error('Orientation lock failed using deprecated method');
+    }
+  } else {
+    console.warn('Screen Orientation API not supported');
+  }
+}
+
+// Function to check current orientation and show/hide overlay
+function checkOrientation() {
+  const overlay = document.getElementById('orientation-overlay');
+  if (window.matchMedia("(orientation: portrait)").matches) {
+    overlay.style.display = 'flex';
+  } else {
+    overlay.style.display = 'none';
+  }
+}
+
+// Listen for orientation changes
+window.addEventListener('orientationchange', checkOrientation);
+window.addEventListener('resize', checkOrientation);
+
+// Initial check on page load
+document.addEventListener('DOMContentLoaded', () => {
+  checkOrientation();
 });

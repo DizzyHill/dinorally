@@ -116,7 +116,6 @@ export default class Bot {
   }
 
   stall(delay = 1000) {
-    console.log("Bot Stalled");
     this.stalled = true;
     this.dx = 0;
     let blinkInterval = 200; // blink every 200ms
@@ -124,12 +123,10 @@ export default class Bot {
     let blinkTimeout = setInterval(() => {
       this.image.style.visibility = (blinkCount % 2 === 0) ? 'hidden' : 'visible';
       blinkCount++;
-      console.log("Bot Blinking", this.image.style.visibility);
     }, blinkInterval);
     clearInterval(blinkTimeout); // stop blinking
     this.image.style.visibility = 'visible'; // make sure the bot is visible again
     setTimeout(() => {
-      console.log("Bot Unstalled");
       this.stalled = false;  // Recover after being stalled
       this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
     }, delay); // Stall for 1 second by default

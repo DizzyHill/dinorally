@@ -5,12 +5,13 @@ export default class Racer {
   // static racerSound = new Audio('./assets/sounds/dino.mp3');
   static jumpSound = new Audio('./assets/sounds/jump.mp3');
 
-  constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false, extraLives = 0, racerSounds) {
+  constructor(dinoName, track, lane, gameHeight, gameSpeed, gameWidth, isBot = false, extraLives = 0, racerSounds, preloadedImages) {
     this.isBot = isBot;
     this.isPlayer = !this.isBot;
     this.track = track
     this.lane = lane; // Use the provided lane
     this.dinoName = dinoName;
+    this.racerImages = preloadedImages;
     this.racerSounds = racerSounds;
     // Dino-specific configurations
     switch(dinoName) {
@@ -67,20 +68,20 @@ export default class Racer {
     this.jumpSound = this.racerSounds.jump;
 
     // Array to store frames
-    this.frames = [];
+    this.frames = this.racerImages;
 
-    // Load the frames
-    for (let i = 1; i <= 4; i++) {
-        const img = new Image();
-        img.src = `./assets/racers/${dinoName.toLowerCase()}/${dinoName.toLowerCase()}_${i}.png`;
-        img.onload = () => {
-          // console.log(`Loaded image: ${img.src}`);
-        };
-        img.onerror = (e) => {
-            console.error(`Failed to load image: ${img.src}`, e);
-        };
-        this.frames.push(img);
-    }
+    // // Load the frames
+    // for (let i = 1; i <= 4; i++) {
+    //     const img = new Image();
+    //     img.src = `./assets/racers/${dinoName.toLowerCase()}/${dinoName.toLowerCase()}_${i}.png`;
+    //     img.onload = () => {
+    //       // console.log(`Loaded image: ${img.src}`);
+    //     };
+    //     img.onerror = (e) => {
+    //         console.error(`Failed to load image: ${img.src}`, e);
+    //     };
+    //     this.frames.push(img);
+    // }
 
     // Frame control variables
     this.currentFrame = 0;      // Start with the first frame
@@ -402,7 +403,7 @@ export default class Racer {
   }
 
   stall(delay = 1000) {
-    console.log(this.dinoName + " Stalled");
+    // console.log(this.dinoName + " Stalled");
     let originalDx = this.dx;
     let originalDy = this.dy;
     this.stalled = true;
@@ -422,7 +423,7 @@ export default class Racer {
     }, 100); // Faster blink interval for more noticeable effect
 
     setTimeout(() => {
-      console.log(this.dinoName + " Unstalled");
+      // console.log(this.dinoName + " Unstalled");
       this.stalled = false;
       this.dx = originalDx; // Restore original speed
       this.dy = originalDy; // Restore original speed

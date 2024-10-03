@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="screen-orientation" content="portrait">
     <title>Dino Rally Rush</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/style.css">
@@ -22,6 +21,10 @@
     <script type="module" src="./js/main.js"></script>
 </head>
 <body>  
+    <div id="orientation-overlay" class="orientation-overlay">
+        <p>Please rotate your device to landscape mode to play the game.</p>
+    </div>
+
     <div id="main" class="flex flex-col h-screen">
 
         <!-- Collectable count -->
@@ -79,14 +82,15 @@
         </div>
 
         <div id="rules" class="hidden z-10 w-full h-full absolute top-0 left-0 flex-auto flex flex-col items-center justify-center">
-            <img class="w-3/4 mx-auto" src="./assets/Rules.png" alt="Dino Rally Rush Rules" />
+            <img class="w-3/4 mx-auto md:hidden" src="./assets/Mobileinstructions.png" alt="Dino Rally Rush Rules" />
+            <img class="w-3/4 mx-auto hidden md:block" src="./assets/PCinstructions.png" alt="Dino Rally Rush Rules" />
             <button id="start-race" class="px-4 px-2 md:px-8 md:py-4 border-4 border-yellow-500 bg-red-500 text-white text-lg md:text-2xl shadow-2xl rounded-xl md:-mt-20 uppercase font-black">Start Race</button>
         </div>
 
-        <canvas id="gameCanvas" class="w-full border-y-8 border-red-500"></canvas>
+        <canvas id="gameCanvas"></canvas>
 
         <!-- Results screen -->
-        <div id="start_over" class="hidden w-3/4 md:w-1/2 h-full md:h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
+        <div id="start_over" class="hidden w-3/4 md:w-1/2 h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
             <div class="border-8 border-orange-500 rounded-2xl bg-yellow-500 h-full">
                 <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-2 md:p-4 bg-white h-full overflow-y-scroll">
                     <div class="grid grid-cols-3 border-b border-black">

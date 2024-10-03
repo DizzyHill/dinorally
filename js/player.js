@@ -207,11 +207,11 @@ export default class Player {
   }
 
   stall(delay = 1000) {
-    console.log("Player Stalled");
+    // console.log("Player Stalled");
     this.stalled = true;
     this.dx = 0;
     setTimeout(() => {
-        console.log("Player Unstalled");
+        // console.log("Player Unstalled");
         this.stalled = false;  // Recover after being stalled
         this.dx = Math.random() * 2 + 1;  // Assign a new speed after stalling
     }, delay); // Stall for 1 second by default
@@ -219,7 +219,7 @@ export default class Player {
 
   jump() {
     if (!this.isJumping) {  // Ensure jump happens only once per press
-        console.log("Jumping");
+        // console.log("Jumping");
         this.isJumping = true;  // Set jumping flag
         
         // Lock the shadow's y-position when the jump starts
