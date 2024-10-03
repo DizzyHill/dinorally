@@ -82,59 +82,59 @@
         </div>
 
         <div id="rules" class="hidden z-10 w-full h-full absolute top-0 left-0 flex-auto flex flex-col items-center justify-center">
-            <img class="w-3/4 mx-auto md:hidden" src="./assets/Mobileinstructions.png" alt="Dino Rally Rush Rules" />
-            <img class="w-3/4 mx-auto hidden md:block" src="./assets/PCinstructions.png" alt="Dino Rally Rush Rules" />
-            <button id="start-race" class="px-4 px-2 md:px-8 md:py-4 border-4 border-yellow-500 bg-red-500 text-white text-lg md:text-2xl shadow-2xl rounded-xl md:-mt-20 uppercase font-black">Start Race</button>
+            <img class="w-3/4 mx-auto sm:hidden" src="./assets/MobileInstructions.png" alt="Dino Rally Rush Rules" />
+            <img class="w-3/4 mx-auto hidden sm:block" src="./assets/PCinstructions.png" alt="Dino Rally Rush Rules" />
+            <button id="start-race" class="px-4 px-2 lg:px-8 lg:py-4 border-4 border-yellow-500 bg-red-500 text-white text-lg lg:text-2xl shadow-2xl rounded-xl lg:-mt-20 uppercase font-black">Start Race</button>
         </div>
 
         <canvas id="gameCanvas"></canvas>
 
         <!-- Results screen -->
-        <div id="start_over" class="hidden w-3/4 md:w-1/2 h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
+        <div id="start_over" class="hidden w-3/4 lg:w-1/2 h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
             <div class="border-8 border-orange-500 rounded-2xl bg-yellow-500 h-full">
-                <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-2 md:p-4 bg-white h-full overflow-y-scroll">
+                <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-2 lg:p-4 bg-white h-full overflow-y-scroll">
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 py-1 md:py-2">
+                        <div class="col-span-2 py-1 lg:py-2">
                             <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/results.png" alt="Results" />
                         </div>
                         <div class="col-span-1">
-                            <img class="w-1/6 md:w-1/4 mx-auto" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
+                            <img class="w-1/6 lg:w-1/4 mx-auto" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
                             <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_nitro.png" alt="Nitro" />
                         </div>
                         <div class="col-span-1">
-                            <div id="nitro-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
+                            <div id="nitro-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
                             <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_comet.png" alt="Comet" />
                         </div>
                         <div class="col-span-1">
-                            <div id="comet-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
+                            <div id="comet-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
                             <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_fuego.png" alt="Fuego" />
                         </div>
                         <div class="col-span-1">
-                            <div id="fuego-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
+                            <div id="fuego-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
-                        <div class="col-span-2 border-r border-black py-1 md:py-2">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
                             <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_bash.png" alt="Bash" />
                         </div>
                         <div class="col-span-1">
-                            <div id="bash-score" class="flex flex-col items-center justify-center h-full md:text-3xl font-black">0</div>
+                            <div id="bash-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
                         </div>
                     </div>
                     
-                    <button class="px-4 py-2 border-4 border-yellow-500 bg-red-500 text-white rounded-xl mt-2 md:mt-8 uppercase font-black" onclick="window.location.reload()">Play Again</button>
+                    <button class="px-4 py-2 border-4 border-yellow-500 bg-red-500 text-white rounded-xl mt-2 lg:mt-8 uppercase font-black" onclick="window.location.reload()">Play Again</button>
                 </div>
             </div>
         </div>
