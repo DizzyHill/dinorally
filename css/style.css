@@ -12,7 +12,16 @@ canvas {
 #character-selection {
   background-color: #fff7d4;
 }
-#character-selection, #start_over {
+#character-selection {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+}
+
+#start_over {
   position: absolute;
   top: 50%;
   left: 50%;

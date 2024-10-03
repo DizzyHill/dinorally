@@ -25,7 +25,7 @@
         <p>Please rotate your device to landscape mode to play the game.</p>
     </div>
 
-    <div id="main" class="flex flex-col h-screen">
+    <div id="main" class="flex flex-col">
 
         <!-- Collectable count -->
         <div id="collectable-count" class="hidden absolute top-0 z-10 flex flex-col items-center justify-center w-full">
@@ -82,20 +82,22 @@
         </div>
 
         <div id="rules" class="hidden z-10 w-full h-full absolute top-0 left-0 flex-auto flex flex-col items-center justify-center">
-            <img class="w-3/4 mx-auto sm:hidden" src="./assets/MobileInstructions.png" alt="Dino Rally Rush Rules" />
-            <img class="w-3/4 mx-auto hidden sm:block" src="./assets/PCinstructions.png" alt="Dino Rally Rush Rules" />
+            <img class="w-3/4 mx-auto lg:hidden" src="./assets/MobileInstructions.png" alt="Dino Rally Rush Rules" />
+
+            <img class="w-3/4 mx-auto hidden lg:block" src="./assets/PCinstructions.png" alt="Dino Rally Rush Rules" />
+
             <button id="start-race" class="px-4 px-2 lg:px-8 lg:py-4 border-4 border-yellow-500 bg-red-500 text-white text-lg lg:text-2xl shadow-2xl rounded-xl lg:-mt-20 uppercase font-black">Start Race</button>
         </div>
 
         <canvas id="gameCanvas"></canvas>
 
         <!-- Results screen -->
-        <div id="start_over" class="hidden w-3/4 lg:w-1/2 h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
+        <div id="start_over" class="hidden w-3/4 sm:w-1/2 relative top-0 h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
             <div class="border-8 border-orange-500 rounded-2xl bg-yellow-500 h-full">
                 <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-2 lg:p-4 bg-white h-full overflow-y-scroll">
                     <div class="grid grid-cols-3 border-b border-black">
                         <div class="col-span-2 py-1 lg:py-2">
-                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/results.png" alt="Results" />
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/results.png" alt="Results" />
                         </div>
                         <div class="col-span-1">
                             <img class="w-1/6 lg:w-1/4 mx-auto" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
@@ -103,7 +105,7 @@
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
                         <div class="col-span-2 border-r border-black py-1 lg:py-2">
-                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_nitro.png" alt="Nitro" />
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_nitro.png" alt="Nitro" />
                         </div>
                         <div class="col-span-1">
                             <div id="nitro-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
@@ -111,7 +113,7 @@
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
                         <div class="col-span-2 border-r border-black py-1 lg:py-2">
-                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_comet.png" alt="Comet" />
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_comet.png" alt="Comet" />
                         </div>
                         <div class="col-span-1">
                             <div id="comet-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
@@ -119,7 +121,7 @@
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
                         <div class="col-span-2 border-r border-black py-1 lg:py-2">
-                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_fuego.png" alt="Fuego" />
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_fuego.png" alt="Fuego" />
                         </div>
                         <div class="col-span-1">
                             <div id="fuego-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
@@ -127,7 +129,7 @@
                     </div>
                     <div class="grid grid-cols-3 border-b border-black">
                         <div class="col-span-2 border-r border-black py-1 lg:py-2">
-                            <img class="w-1/4 sm:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_bash.png" alt="Bash" />
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_bash.png" alt="Bash" />
                         </div>
                         <div class="col-span-1">
                             <div id="bash-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
@@ -151,11 +153,9 @@
             </div>
             <div class="right-controls mr-10">
                 <button id="jump-button" class="w-20 h-20 mb-4 flex flex-col items-center justify-center">
-                    <!-- <svg class="mr-10 w-full" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400"><defs><style>.cls-1{fill:url(#linear-gradient-2);stroke:#606060;stroke-miterlimit:10;stroke-width:1.91px;}.cls-2{fill:url(#linear-gradient);stroke-width:0px;}</style><linearGradient id="linear-gradient" x1="116.5" y1="274.94" x2="409.02" y2="12.42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".3" stop-color="#999"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient><linearGradient id="linear-gradient-2" x1="53.33" y1="73" x2="303.68" y2="286.57" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient></defs><path class="cls-2" d="m200,3.48C91.47,3.48,3.48,91.47,3.48,200s87.98,196.52,196.52,196.52,196.52-87.98,196.52-196.52S308.53,3.48,200,3.48Zm0,357.25c-90.87,0-164.53-73.66-164.53-164.53S109.13,31.67,200,31.67s164.53,73.66,164.53,164.53-73.66,164.53-164.53,164.53Z"/><circle class="cls-1" cx="197.74" cy="196.2" r="164.53"/></svg>                     -->
                      <img class="w-full mr-10" src="./assets/Buttons/springbutton.png" />
                 </button>
                 <button id="fire-button" class="w-20 h-20 flex flex-col items-center justify-center">
-                    <!-- <svg class="w-full" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400"><defs><style>.cls-1{fill:url(#linear-gradient-2);stroke:#606060;stroke-miterlimit:10;stroke-width:1.91px;}.cls-2{fill:url(#linear-gradient);stroke-width:0px;}</style><linearGradient id="linear-gradient" x1="116.5" y1="274.94" x2="409.02" y2="12.42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".3" stop-color="#999"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient><linearGradient id="linear-gradient-2" x1="53.33" y1="73" x2="303.68" y2="286.57" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient></defs><path class="cls-2" d="m200,3.48C91.47,3.48,3.48,91.47,3.48,200s87.98,196.52,196.52,196.52,196.52-87.98,196.52-196.52S308.53,3.48,200,3.48Zm0,357.25c-90.87,0-164.53-73.66-164.53-164.53S109.13,31.67,200,31.67s164.53,73.66,164.53,164.53-73.66,164.53-164.53,164.53Z"/><circle class="cls-1" cx="197.74" cy="196.2" r="164.53"/></svg> -->
                      <img class="w-full" src="./assets/Buttons/fireballbutton.png" />
                 </button>
             </div>
