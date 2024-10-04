@@ -376,7 +376,7 @@ export default class Game {
     this.spawnObject(Boost, 0.15, lanes[1]);
     this.spawnObject(Coin, 0.5, lanes[2]);
     this.spawnObject(CoinJar, 0.05, lanes[2]);
-    this.spawnObject(MysteryBox, 0.01, lanes[1]);
+    this.spawnObject(MysteryBox, 0.02, lanes[1]);
     this.spawnObject(Collectable, 0.05, lanes[3]);
     this.spawnObject(Heart, 0.03, lanes[3]);
 
@@ -683,6 +683,7 @@ export default class Game {
     this.drawCoinTally();
     this.drawFireBallTally();
     this.drawLivesTally();
+    this.drawMysteryBoxTally();
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
     // console.log(this.gameSpeed)
