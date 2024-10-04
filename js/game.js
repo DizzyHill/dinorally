@@ -4,6 +4,7 @@ import Obstacle from './obstacle.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
 import CoinJar from './coinJar.js';
+import MysteryBox from './mysteryBox.js';
 import Track from './track.js';
 import Collectable from './collectable.js';
 import Heart from './heart.js';
@@ -54,6 +55,7 @@ export default class Game {
     this.gameOverSound = this.createAudio('./assets/sounds/game_over.mp3', false, 0.7);
     // this.coinSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
     this.collectableSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
+    this.mysteryBoxSound = this.createAudio('./assets/sounds/boxsound.mp3', false, 0.5);
     this.boostSound = this.createAudio('./assets/sounds/boost.mp3', false, 0.5);
     this.fireballSound = this.createAudio('./assets/sounds/fireball.mp3', false, 0.5);
     this.explosionSound = this.createAudio('./assets/sounds/explosion.mp3', false, 0.5);
@@ -94,6 +96,7 @@ export default class Game {
         this.preloadBoostImages(),
         this.preloadCoinImages(),
         this.preloadCoinJarImages(),
+        this.preloadMysteryBoxImages(),
         this.preloadCollectableImages(),
         this.preloadHeartImages(),
         this.preloadExplosionImages()
@@ -195,6 +198,13 @@ export default class Game {
     return new Promise((resolve, reject) => {
       const imagesToLoad = ['./assets/collectables/DR_VG_PickleJar(300x200).png'];
       this.loadImages(imagesToLoad, 'coinjars', resolve, reject);
+    });
+  }
+
+  preloadMysteryBoxImages() {
+    return new Promise((resolve, reject) => {
+      const imagesToLoad = ['./assets/collectables/mystery_box.png'];
+      this.loadImages(imagesToLoad, 'mysteryboxs', resolve, reject);
     });
   }
 
@@ -366,6 +376,7 @@ export default class Game {
     this.spawnObject(Boost, 0.15, lanes[1]);
     this.spawnObject(Coin, 0.5, lanes[2]);
     this.spawnObject(CoinJar, 0.05, lanes[2]);
+    this.spawnObject(MysteryBox, 0.01, lanes[1]);
     this.spawnObject(Collectable, 0.05, lanes[3]);
     this.spawnObject(Heart, 0.03, lanes[3]);
 
@@ -403,6 +414,8 @@ export default class Game {
           audio = this.explosionSound;
         } else if (objectName === "collectables" || objectName === "coins" || objectName === "coinjars" || objectName === "hearts") {
           audio = this.collectableSound;
+        } else if (objectName === "mysteryboxs") {
+          audio = this.mysteryBoxSound;
         } else if (objectName === "boosts") {
           audio = this.boostSound;
         }
@@ -524,6 +537,8 @@ export default class Game {
       this.collectCoin(obj, racer);
     } else if (obj instanceof CoinJar) {
       this.collectCoin(obj, racer, 3);
+    } else if (obj instanceof MysteryBox) {
+      this.collectMysteryBox(obj, racer, 1);
     } else if (obj instanceof Heart) {
       this.collectHeart(obj, racer);
     } else if (obj instanceof Obstacle) {
@@ -555,6 +570,13 @@ export default class Game {
     racer.coinCount = (racer.coinCount || 0) + count;
     if (racer === this.player) { 
       coin.playCoinSound();
+    }
+  }
+
+  collectMysteryBox(mysteryBox, racer, count = 1) {
+    if (racer === this.player) {
+      racer.mysteryBoxCount = (racer.mysteryBoxCount || 0) + count;
+      mysteryBox.playCollectSound();
     }
   }
 
@@ -601,6 +623,13 @@ export default class Game {
   drawCoinTally() {
     // this.drawInfoBox(`Pickles: ${this.coinCount}`, this.gameWidth - 170, 10, 150, 40);
     document.getElementById('coin-count').innerHTML = this.player.coinCount;
+  }
+
+  drawMysteryBoxTally() {
+    // this.drawInfoBox(`Mystery Boxes: ${this.mysteryBoxCount}`, this.gameWidth - 340, 10, 150, 40);
+    if (this.player.mysteryBoxCount > 0) {
+      document.getElementById('mysterybox').classList.remove('hidden');
+    }
   }
 
   drawLivesTally() {
