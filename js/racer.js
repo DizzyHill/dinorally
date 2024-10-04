@@ -184,11 +184,11 @@ export default class Racer {
       const frame = this.frames[this.currentFrame];
 
       if (frame.complete) {
-        if (this.isBot) {
-          ctx.globalAlpha = 0.75; // adjust this value to change the opacity (0 = fully transparent, 1 = fully opaque)
-        }
+        // if (this.isBot) {
+        //   ctx.globalAlpha = 0.75; // adjust this value to change the opacity (0 = fully transparent, 1 = fully opaque)
+        // }
         ctx.drawImage(frame, this.x, this.y, this.width, this.height);
-        ctx.globalAlpha = 1;
+        // ctx.globalAlpha = 1;
       }
     }
 
