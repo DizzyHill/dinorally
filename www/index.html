@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dino Rally Rush</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="manifest" crossorigin="use-credentials" href="./manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Spaces">
+    <link rel="apple-touch-icon" href="./assets/dino-rally-rush-icon.png">
+    <script type="importmap">
+        {
+            "imports": {
+            "tween.js": "https://cdnjs.cloudflare.com/ajax/libs/tween.js/25.0.0/tween.umd.js"
+            }
+        }
+    </script>
+    <script type="module" src="./js/main.js"></script>
+</head>
+<body>  
+    <div id="orientation-overlay" class="orientation-overlay">
+        <p>Please rotate your device to landscape mode to play the game.</p>
+    </div>
+
+    <div id="main" class="flex flex-col">
+
+        <!-- Collectable count -->
+        <div id="collectable-count" class="hidden absolute top-0 z-10 flex flex-col items-center justify-center w-full">
+            <div class="rounded-lg bg-white p-2 mt-2 flex flex-row items-center justify-between shadow-2xl border-4 border-red-500">
+                <div class="flex flex-row items-center mr-4">
+                    <img class="h-10 mr-2" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
+                    <div id="coin-count" class="text-black text-2xl font-black">0</div>
+                </div>
+                <div class="flex flex-row items-center mr-4">
+                    <img class="h-10 mr-2" src="./assets/collectables/HeartIcon.png" alt="Pickles" />
+                    <div id="heart-count" class="text-black text-2xl font-black">0</div>
+                </div>
+                <div class="flex flex-row items-center mr-4">
+                    <img class="h-10 mr-2" src="./assets/collectables/hot_sauce.png" alt="Pickles" />
+                    <div id="fireball-count" class="text-black text-2xl font-black">0</div>
+                </div>
+                <div id="mysterybox" class="hidden flex flex-row items-center mr-4">
+                    <p class="text-black text-2xl font-black">You Got a Mystery Box!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Character selection -->
+        <div id="character-selection" class="w-3/4 mx-auto rounded-xl border-8 border-red-500 py-8 shadow-2xl flex flex-col">
+            <div class="w-full mb-10">
+                <img src="./assets/DRR_Logo.Bars.png" alt="Dino Rally Rush Logo" />
+            </div>  
+            <div class="racers sm:w-3/4 mx-auto grid grid-cols-4 gap-2">
+                <div class="start-game hover:scale-105 transition-all duration-300 flex flex-col items-center justify-between" data-dinoName="Nitro">
+                    <div class="w-full">
+                        <img class="w-full" src="./assets/character_select/nitro_select.png" alt="Nitro Dino" data-dinoName="Nitro" />
+                    </div>
+                    
+                </div>
+                <div class="start-game hover:scale-105 transition-all duration-300 flex flex-col items-center justify-end" data-dinoName="Comet">
+                    <div class="w-full">
+                        <img class="w-full" src="./assets/character_select/comet_select.png" alt="Comet Dino" data-dinoName="Comet" />
+                    </div>
+                    
+                </div>
+                <div class="start-game hover:scale-105 transition-all duration-300 flex flex-col items-center justify-between" data-dinoName="Fuego">
+                    <div class="w-full">
+                        <img class="w-full" src="./assets/character_select/fuego_select.png" alt="Fuego Dino" data-dinoName="Fuego" />
+                    </div>
+                    
+                </div>
+                <div class="start-game hover:scale-105 transition-all duration-300 flex flex-col items-center justify-between" data-dinoName="Bash">
+                    <div class="w-full">
+                        <img class="w-full" src="./assets/character_select/bash_select.png" alt="Bash Dino" data-dinoName="Bash" />
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="w-full mt-4">
+                <h1 class="text-4xl font-black uppercase">Choose your Racer!</h1>
+            </div>
+        </div>
+
+        <div id="rules" class="hidden z-10 w-full h-full absolute top-0 left-0 flex-auto flex flex-col items-center justify-center">
+            <img class="w-3/4 mx-auto lg:hidden" src="./assets/MobileInstructions.png" alt="Dino Rally Rush Rules" />
+
+            <img class="w-3/4 mx-auto hidden lg:block" src="./assets/PCinstructions.png" alt="Dino Rally Rush Rules" />
+
+            <button id="start-race" class="px-4 px-2 lg:px-8 lg:py-4 border-4 border-yellow-500 bg-red-500 text-white text-lg lg:text-2xl shadow-2xl rounded-xl lg:-mt-20 uppercase font-black">Start Race</button>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Results screen -->
+        <div id="start_over" class="hidden w-3/4 sm:w-1/2 relative top-0 h-auto shadow-2xl rounded-3xl border-8 border-red-500 bg-orange-500">
+            <div class="border-8 border-orange-500 rounded-2xl bg-yellow-500 h-full">
+                <div class="border-8 border-yellow-500 rounded-xl flex-col items-center p-2 lg:p-4 bg-white h-full overflow-y-scroll">
+                    <div class="grid grid-cols-3 border-b border-black">
+                        <div class="col-span-2 py-1 lg:py-2">
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/results.png" alt="Results" />
+                        </div>
+                        <div class="col-span-1">
+                            <img class="w-1/6 lg:w-1/4 mx-auto" src="./assets/collectables/DR_VG_pickleWeb(200x300).png" alt="Pickles" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 border-b border-black">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_nitro.png" alt="Nitro" />
+                        </div>
+                        <div class="col-span-1">
+                            <div id="nitro-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 border-b border-black">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_comet.png" alt="Comet" />
+                        </div>
+                        <div class="col-span-1">
+                            <div id="comet-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 border-b border-black">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_fuego.png" alt="Fuego" />
+                        </div>
+                        <div class="col-span-1">
+                            <div id="fuego-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 border-b border-black">
+                        <div class="col-span-2 border-r border-black py-1 lg:py-2">
+                            <img class="w-1/4 lg:w-1/2 mx-auto" src="./assets/leaderboard/leaderboard_bash.png" alt="Bash" />
+                        </div>
+                        <div class="col-span-1">
+                            <div id="bash-score" class="flex flex-col items-center justify-center h-full lg:text-3xl font-black">0</div>
+                        </div>
+                    </div>
+                    
+                    <button class="px-4 py-2 border-4 border-yellow-500 bg-red-500 text-white rounded-xl mt-2 lg:mt-8 uppercase font-black" onclick="window.location.reload()">Play Again</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile controls -->
+        <div id="mobile-controls" class="hidden flex flex-row items-center justify-between">
+            <div class="left-controls ml-10">
+                <button id="up-button" class="w-20 h-20 mb-4 flex flex-col items-center justify-center">
+                    <svg class="w-full ml-10" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400"><defs><style>.cls-1{fill:url(#linear-gradient-2);stroke:#606060;stroke-miterlimit:10;stroke-width:1.91px;}.cls-2{fill:url(#linear-gradient);stroke-width:0px;}</style><linearGradient id="linear-gradient" x1="8.8" y1="200" x2="391.2" y2="200" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".3" stop-color="#999"/><stop offset=".44" stop-color="#aeaeae" stop-opacity=".69"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient><linearGradient id="linear-gradient-2" x1="28.78" y1="200" x2="371.22" y2="200" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient></defs><path class="cls-2" d="m385.69,308.5L244.9,48.39c-8.64-15.96-25.84-25.87-44.9-25.87s-36.26,9.91-44.9,25.87L14.31,308.5c-7.67,14.17-7.32,30.9.93,44.75,8.9,14.95,25.75,24.23,43.97,24.23h281.57c18.22,0,35.07-9.28,43.97-24.23,8.25-13.85,8.6-30.58.93-44.75Zm-44.9,48.98H59.22c-22.47,0-37.17-21.24-27.31-39.46l73.37-135.55,67.42-124.56c11.11-20.52,43.52-20.52,54.62,0l67.42,124.56,73.37,135.55c9.86,18.22-4.84,39.46-27.31,39.46Z"/><path class="cls-1" d="m172.69,57.91c11.11-20.52,43.52-20.52,54.62,0l67.42,124.56,73.37,135.55c9.86,18.22-4.84,39.46-27.31,39.46H59.22c-22.47,0-37.17-21.24-27.31-39.46l73.37-135.55,67.42-124.56Z"/></svg>
+                </button>
+                <button id="down-button" class="w-20 h-20 flex flex-col items-center justify-center">
+                    <svg class="w-full" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400"><defs><style>.cls-1{fill:url(#linear-gradient-2);stroke:#606060;stroke-miterlimit:10;stroke-width:1.91px;}.cls-2{fill:url(#linear-gradient);stroke-width:0px;}</style><linearGradient id="linear-gradient" x1="8.8" y1="173.18" x2="391.2" y2="173.18" gradientTransform="translate(400 373.18) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset=".3" stop-color="#999"/><stop offset=".44" stop-color="#aeaeae" stop-opacity=".69"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient><linearGradient id="linear-gradient-2" x1="28.78" y1="173.18" x2="371.22" y2="173.18" gradientTransform="translate(400 373.18) rotate(-180)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient></defs><path class="cls-2" d="m14.31,91.5l140.78,260.11c8.64,15.96,25.84,25.87,44.9,25.87s36.26-9.91,44.9-25.87L385.69,91.5c7.67-14.17,7.32-30.9-.93-44.75-8.9-14.95-25.75-24.23-43.97-24.23H59.22c-18.22,0-35.07,9.28-43.97,24.23-8.25,13.85-8.6,30.58-.93,44.75Zm44.9-48.98h281.57c22.47,0,37.17,21.24,27.31,39.46l-73.37,135.55-67.42,124.56c-11.11,20.52-43.52,20.52-54.62,0l-67.42-124.56L31.9,81.98c-9.86-18.22,4.84-39.46,27.31-39.46Z"/><path class="cls-1" d="m227.31,342.09c-11.11,20.52-43.52,20.52-54.62,0l-67.42-124.56L31.9,81.98c-9.86-18.22,4.84-39.46,27.31-39.46h281.57c22.47,0,37.17,21.24,27.31,39.46l-73.37,135.55-67.42,124.56Z"/></svg>
+                </button>
+            </div>
+            <div class="right-controls mr-10">
+                <button id="jump-button" class="w-20 h-20 mb-4 flex flex-col items-center justify-center">
+                     <img class="w-full mr-10" src="./assets/Buttons/springbutton.png" />
+                </button>
+                <button id="fire-button" class="w-20 h-20 flex flex-col items-center justify-center">
+                     <img class="w-full" src="./assets/Buttons/fireballbutton.png" />
+                </button>
+            </div>
+        </div>
+    </div>    
+</body>
+</html>
