@@ -173,16 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Function to request fullscreen and lock orientation
 async function requestFullscreenAndLockOrientation() {
-  const mainContainer = document.getElementById('main'); // Select the main container for fullscreen
+  // const mainContainer = document.getElementById('main'); // Select the main container for fullscreen
   
-  // Request fullscreen on the main container or body
-  if (mainContainer.requestFullscreen) {
-    await mainContainer.requestFullscreen();
-  } else if (mainContainer.webkitRequestFullscreen) { /* Safari */
-    await mainContainer.webkitRequestFullscreen();
-  } else if (mainContainer.msRequestFullscreen) { /* IE11 */
-    await mainContainer.msRequestFullscreen();
-  }
+  // // Request fullscreen on the main container or body
+  // if (mainContainer.requestFullscreen) {
+  //   await mainContainer.requestFullscreen();
+  // } else if (mainContainer.webkitRequestFullscreen) { /* Safari */
+  //   await mainContainer.webkitRequestFullscreen();
+  // } else if (mainContainer.msRequestFullscreen) { /* IE11 */
+  //   await mainContainer.msRequestFullscreen();
+  // }
 
   // Lock orientation to landscape
   if (screen.orientation && screen.orientation.lock) {
