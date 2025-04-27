@@ -22,6 +22,8 @@ export default class Projectile extends Collidable {
     this.frameInterval = 100;   // Adjust the interval (in ms) for frame switching
     this.lastFrameTime = Date.now(); // Track time to switch frames
 
+    this.fireballSound.play(); // Play sound on creation
+
   }
   animateFrames() {
     const now = Date.now();
@@ -50,7 +52,6 @@ export default class Projectile extends Collidable {
 
     if (frame.complete) {
       ctx.drawImage(frame, this.x, this.y, this.width, this.height);
-      this.fireballSound.play();
     }
   }
 

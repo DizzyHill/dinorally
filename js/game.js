@@ -4,7 +4,7 @@ import Obstacle from './obstacle.js';
 import Boost from './boost.js';
 import Coin from './coin.js';
 import CoinJar from './coinJar.js';
-import MysteryBox from './mysteryBox.js';
+// import MysteryBox from './mysteryBox.js';
 import Track from './track.js';
 import Collectable from './collectable.js';
 import Heart from './heart.js';
@@ -55,7 +55,7 @@ export default class Game {
     this.gameOverSound = this.createAudio('./assets/sounds/game_over.mp3', false, 0.7);
     // this.coinSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
     this.collectableSound = this.createAudio('./assets/sounds/coin.mp3', false, 0.5);
-    this.mysteryBoxSound = this.createAudio('./assets/sounds/boxsound.mp3', false, 0.5);
+    // this.mysteryBoxSound = this.createAudio('./assets/sounds/boxsound.mp3', false, 0.5);
     this.boostSound = this.createAudio('./assets/sounds/boost.mp3', false, 0.5);
     this.fireballSound = this.createAudio('./assets/sounds/fireball.mp3', false, 0.5);
     this.explosionSound = this.createAudio('./assets/sounds/explosion.mp3', false, 0.5);
@@ -96,7 +96,7 @@ export default class Game {
         this.preloadBoostImages(),
         this.preloadCoinImages(),
         this.preloadCoinJarImages(),
-        this.preloadMysteryBoxImages(),
+        // this.preloadMysteryBoxImages(),
         this.preloadCollectableImages(),
         this.preloadHeartImages(),
         this.preloadExplosionImages()
@@ -201,12 +201,12 @@ export default class Game {
     });
   }
 
-  preloadMysteryBoxImages() {
-    return new Promise((resolve, reject) => {
-      const imagesToLoad = ['./assets/collectables/mystery_box.png'];
-      this.loadImages(imagesToLoad, 'mysteryboxs', resolve, reject);
-    });
-  }
+  // preloadMysteryBoxImages() {
+  //   return new Promise((resolve, reject) => {
+  //     const imagesToLoad = ['./assets/collectables/mystery_box.png'];
+  //     this.loadImages(imagesToLoad, 'mysteryboxs', resolve, reject);
+  //   });
+  // }
 
   preloadCollectableImages() {
     return new Promise((resolve, reject) => {
@@ -376,7 +376,7 @@ export default class Game {
     this.spawnObject(Boost, 0.15, lanes[1]);
     this.spawnObject(Coin, 0.5, lanes[2]);
     this.spawnObject(CoinJar, 0.05, lanes[2]);
-    this.spawnObject(MysteryBox, 0.02, lanes[1]);
+    // this.spawnObject(MysteryBox, 0.02, lanes[1]);
     this.spawnObject(Collectable, 0.05, lanes[3]);
     this.spawnObject(Heart, 0.03, lanes[3]);
 
@@ -414,8 +414,8 @@ export default class Game {
           audio = this.explosionSound;
         } else if (objectName === "collectables" || objectName === "coins" || objectName === "coinjars" || objectName === "hearts") {
           audio = this.collectableSound;
-        } else if (objectName === "mysteryboxs") {
-          audio = this.mysteryBoxSound;
+        // } else if (objectName === "mysteryboxs") {
+        //   audio = this.mysteryBoxSound;
         } else if (objectName === "boosts") {
           audio = this.boostSound;
         }
@@ -456,15 +456,16 @@ export default class Game {
   }
 
   updateObjects() {
+    // Update and filter collidables (obstacles, coins, etc.)
     this.collidables = this.collidables.filter((obj) => {
       obj.update();
-      obj.draw(this.ctx);
+      // obj.draw(this.ctx); // REMOVED DRAW CALL
       
       // Check collisions for all racers
       for (const racer of this.racers) {
         if (this.detectCollision(racer, obj)) {
           this.handleCollision(racer, obj);
-          return false;
+          return false; // Remove object after collision
         }
       }
       
@@ -472,12 +473,15 @@ export default class Game {
       return obj.x + obj.width > 0;
     });
 
-    // Update and draw projectiles
+    // Pre-filter obstacles for projectile collision checks
+    const obstacles = this.collidables.filter(obj => obj instanceof Obstacle);
+
+    // Update and filter projectiles
     this.projectiles = this.projectiles.filter(projectile => {
       projectile.update();
-      projectile.draw(this.ctx);
+      // projectile.draw(this.ctx); // REMOVED DRAW CALL
 
-      // Check collisions with racers and obstacles
+      // Check collisions with racers 
       for (const racer of this.racers) {
         if (racer !== this.player && this.detectCollision(projectile, racer)) {
           racer.stall(3000);
@@ -486,7 +490,8 @@ export default class Game {
         }
       }
 
-      for (const obstacle of this.collidables.filter(obj => obj instanceof Obstacle)) {
+      // Check collisions with obstacles (using pre-filtered list)
+      for (const obstacle of obstacles) { 
         if (this.detectCollision(projectile, obstacle)) {
           this.explodeObstacle(obstacle);
           projectile.explosionSound.play();
@@ -537,8 +542,8 @@ export default class Game {
       this.collectCoin(obj, racer);
     } else if (obj instanceof CoinJar) {
       this.collectCoin(obj, racer, 3);
-    } else if (obj instanceof MysteryBox) {
-      this.collectMysteryBox(obj, racer, 1);
+    // } else if (obj instanceof MysteryBox) {
+    //   this.collectMysteryBox(obj, racer, 1);
     } else if (obj instanceof Heart) {
       this.collectHeart(obj, racer);
     } else if (obj instanceof Obstacle) {
@@ -573,12 +578,12 @@ export default class Game {
     }
   }
 
-  collectMysteryBox(mysteryBox, racer, count = 1) {
-    if (racer === this.player) {
-      racer.mysteryBoxCount = (racer.mysteryBoxCount || 0) + count;
-      mysteryBox.playCollectSound();
-    }
-  }
+  // collectMysteryBox(mysteryBox, racer, count = 1) {
+  //   if (racer === this.player) {
+  //     racer.mysteryBoxCount = (racer.mysteryBoxCount || 0) + count;
+  //     mysteryBox.playCollectSound();
+  //   }
+  // }
 
   collectHeart(heart, racer) {
     if (racer === this.player) {
@@ -625,12 +630,12 @@ export default class Game {
     document.getElementById('coin-count').innerHTML = this.player.coinCount;
   }
 
-  drawMysteryBoxTally() {
-    // this.drawInfoBox(`Mystery Boxes: ${this.mysteryBoxCount}`, this.gameWidth - 340, 10, 150, 40);
-    if (this.player.mysteryBoxCount > 0) {
-      document.getElementById('mysterybox').classList.remove('hidden');
-    }
-  }
+  // drawMysteryBoxTally() {
+  //   // this.drawInfoBox(`Mystery Boxes: ${this.mysteryBoxCount}`, this.gameWidth - 340, 10, 150, 40);
+  //   if (this.player.mysteryBoxCount > 0) {
+  //     document.getElementById('mysterybox').classList.remove('hidden');
+  //   }
+  // }
 
   drawLivesTally() {
     // this.drawInfoBox(`Acorns: ${this.player.collectableCount}`, this.gameWidth / 2 - 75, 10, 150, 40);
@@ -673,17 +678,29 @@ export default class Game {
     this.ctx.clearRect(0, 0, this.gameWidth, this.gameHeight);
     this.drawBackground();
     this.track.draw(this.ctx);
-    this.updateObjects();
     
+    // Update all objects and handle collisions first
+    this.updateObjects(); 
+    
+    // Draw all collidables (obstacles, items, etc.)
+    this.collidables.forEach(obj => obj.draw(this.ctx));
+
+    // Draw all projectiles
+    this.projectiles.forEach(projectile => projectile.draw(this.ctx));
+
+    // Update and draw racers (sorted by y-position for correct layering)
     this.racers.sort((a, b) => a.y - b.y).forEach(racer => {
-      racer.update();
-      racer.draw(this.ctx);
+      racer.update(); // Update racer state
+      racer.draw(this.ctx); // Draw racer
     });
 
+    // Draw UI elements
     this.drawCoinTally();
     this.drawFireBallTally();
     this.drawLivesTally();
-    this.drawMysteryBoxTally();
+    // this.drawMysteryBoxTally();
+    
+    // Request next frame
     requestAnimationFrame(this.gameLoop.bind(this));
     TWEENUpdate();
     // console.log(this.gameSpeed)
